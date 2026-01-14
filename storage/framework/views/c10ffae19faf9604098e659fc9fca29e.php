@@ -1,4 +1,3 @@
-
 <?php $__env->startSection('title','Pengumuman Sistem'); ?>
 <?php $__env->startSection('content'); ?>
 <div class="content-header">

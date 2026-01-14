@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Siswa;
 
 class SiswaProfileController extends Controller
 {
@@ -14,7 +15,12 @@ class SiswaProfileController extends Controller
      */
     public function showProfile()
     {
-        return view('siswa.profile');
+        $user = Auth::user();
+        $siswa = Siswa::where('email', $user->email)->first();
+
+        return view('siswa.profile', [
+            'siswa' => $siswa,
+        ]);
     }
 
     /**
@@ -24,18 +30,46 @@ class SiswaProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
+        $siswa = Siswa::where('email', $user->email)->first();
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email,' . $user->id,
+                'unique:siswas,email,' . optional($siswa)->id,
+            ],
             'phone' => ['nullable', 'string', 'max:20'],
             'birth_date' => ['nullable', 'date'],
             'address' => ['nullable', 'string', 'max:500'],
             'bio' => ['nullable', 'string', 'max:500'],
+            'nisn' => ['required', 'string', 'max:50', 'unique:siswas,nisn,' . optional($siswa)->id],
+            'jurusan_sma' => ['required', 'string', 'max:255'],
+            'asal_sekolah' => ['required', 'string', 'max:255'],
+            'tahun_lulus' => ['required', 'digits:4'],
         ]);
 
-        $user->fill($validated);
+        $userFields = ['name', 'email', 'phone', 'birth_date', 'address', 'bio'];
+        $user->fill(array_intersect_key($validated, array_flip($userFields)));
         $user->save();
+
+        $siswaData = collect($validated)->only([
+            'name',
+            'nisn',
+            'email',
+            'jurusan_sma',
+            'asal_sekolah',
+            'tahun_lulus',
+        ])->toArray();
+
+        if ($siswa) {
+            $siswa->update($siswaData);
+        } else {
+            Siswa::create($siswaData);
+        }
 
         return redirect()->route('siswa.profile')->with('success', 'Profil berhasil diperbarui!');
     }

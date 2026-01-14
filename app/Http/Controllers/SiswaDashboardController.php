@@ -69,4 +69,21 @@ class SiswaDashboardController extends Controller
         
         return $pdf->download($filename);
     }
+    
+    public function viewPdf($id)
+    {
+        $result = SpkResult::with('siswa')->findOrFail($id);
+        
+        // Check if user has access to this result
+        if (in_array(Auth::user()->role, ['siswa', 'mahasiswa'])) {
+            $siswa = Siswa::where('email', Auth::user()->email)->first();
+            if (!$siswa || $result->siswa_id !== $siswa->id) {
+                abort(403, 'Unauthorized access');
+            }
+        }
+        
+        $pdf = Pdf::loadView('pdf.spk-result', compact('result'));
+        
+        return $pdf->stream();
+    }
 }

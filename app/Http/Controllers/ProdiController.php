@@ -29,21 +29,27 @@ class ProdiController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nama_prodi' => ['required','string','max:255'],
-            'nama_fakultas' => ['required','string','max:255'],
-            'kode_prodi' => ['required','string','max:50','unique:prodis,kode_prodi'],
-            'deskripsi' => ['nullable','string'],
-            'visi_misi' => ['nullable','string'],
-            'prospek_kerja' => ['nullable','string'],
-            'visi_misi_url' => ['nullable','url','max:500'],
-            'prospek_url' => ['nullable','url','max:500'],
-            'kurikulum_url' => ['nullable','url','max:500'],
-            'kurikulum_embed' => ['nullable','boolean'],
-        ]);
+        try {
+            $data = $request->validate([
+                'nama_prodi' => ['required','string','max:255','unique:prodis,nama_prodi'],
+                'nama_fakultas' => ['required','string','max:255'],
+                'kode_prodi' => ['required','string','max:50','unique:prodis,kode_prodi'],
+                'deskripsi' => ['nullable','string'],
+                'visi_misi' => ['nullable','string'],
+                'prospek_kerja' => ['nullable','string'],
+                'visi_misi_url' => ['nullable','url','max:500'],
+                'prospek_url' => ['nullable','url','max:500'],
+                'kurikulum_url' => ['nullable','url','max:500'],
+                'kurikulum_embed' => ['nullable','boolean'],
+            ]);
 
-        Prodi::create($data);
-        return redirect()->route('prodi.index')->with('success','Prodi berhasil ditambahkan.');
+            Prodi::create($data);
+            return redirect()->route('prodi.index')->with('success','Prodi berhasil ditambahkan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->route('prodi.index')
+                ->withErrors($e->validator)
+                ->withInput();
+        }
     }
 
     /**
@@ -76,7 +82,7 @@ class ProdiController extends Controller
         
         try {
             $data = $request->validate([
-                'nama_prodi' => ['required','string','max:255'],
+                'nama_prodi' => ['required','string','max:255','unique:prodis,nama_prodi,'.$prodi->id],
                 'nama_fakultas' => ['required','string','max:255'],
                 'kode_prodi' => ['required','string','max:50','unique:prodis,kode_prodi,'.$prodi->id],
                 'deskripsi' => ['nullable','string'],

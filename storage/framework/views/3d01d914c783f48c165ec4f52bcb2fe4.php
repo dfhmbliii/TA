@@ -139,6 +139,21 @@ function getFakultasColor($fakultas) {
             <form action="<?php echo e(route('prodi.store')); ?>" method="POST">
                 <?php echo csrf_field(); ?>
                 <div class="modal-body">
+                    <?php if($errors->any()): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Terjadi Kesalahan Validasi
+                            </h6>
+                            <ul class="mb-0">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
@@ -146,7 +161,24 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-graduation-cap me-1"></i>
                                     Nama Program Studi
                                 </label>
-                                <input type="text" class="form-control" id="nama_prodi" name="nama_prodi" required placeholder="Masukkan nama program studi">
+                                <input type="text" class="form-control <?php $__errorArgs = ['nama_prodi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="nama_prodi" name="nama_prodi" value="<?php echo e(old('nama_prodi')); ?>" required placeholder="Masukkan nama program studi">
+                                <?php $__errorArgs = ['nama_prodi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 <div class="form-text">Nama lengkap program studi</div>
                             </div>
                         </div>
@@ -156,7 +188,24 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-university me-1"></i>
                                     Nama Fakultas
                                 </label>
-                                <input type="text" class="form-control" id="nama_fakultas" name="nama_fakultas" required placeholder="Masukkan nama fakultas">
+                                <input type="text" class="form-control <?php $__errorArgs = ['nama_fakultas'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="nama_fakultas" name="nama_fakultas" value="<?php echo e(old('nama_fakultas')); ?>" required placeholder="Masukkan nama fakultas">
+                                <?php $__errorArgs = ['nama_fakultas'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 <div class="form-text">Nama fakultas program studi</div>
                             </div>
                         </div>
@@ -166,7 +215,24 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-code me-1"></i>
                                     Kode Program Studi
                                 </label>
-                                <input type="text" class="form-control" id="kode_prodi" name="kode_prodi" required placeholder="Contoh: TI, SI, MI">
+                                <input type="text" class="form-control <?php $__errorArgs = ['kode_prodi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="kode_prodi" name="kode_prodi" value="<?php echo e(old('kode_prodi')); ?>" required placeholder="Contoh: TI, SI, MI">
+                                <?php $__errorArgs = ['kode_prodi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 <div class="form-text">Kode singkat program studi</div>
                             </div>
                         </div>
@@ -177,7 +243,24 @@ function getFakultasColor($fakultas) {
                             <i class="fas fa-info-circle me-1"></i>
                             Deskripsi Program Studi
                         </label>
-                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan deskripsi program studi"></textarea>
+                        <textarea class="form-control <?php $__errorArgs = ['deskripsi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan deskripsi program studi"><?php echo e(old('deskripsi')); ?></textarea>
+                        <?php $__errorArgs = ['deskripsi'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         <div class="form-text">Deskripsi lengkap tentang program studi</div>
                     </div>
                 </div>
@@ -336,6 +419,10 @@ function getFakultasColor($fakultas) {
 
     // Show any error messages in modals if they exist
     <?php if($errors->any()): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            const createModal = new bootstrap.Modal(document.getElementById('createProdiModal'));
+            createModal.show();
+        });
         <?php if(session('editProdiId')): ?>
             // Reopen modal with the prodi ID that had validation errors
             editProdi(<?php echo e(session('editProdiId')); ?>);

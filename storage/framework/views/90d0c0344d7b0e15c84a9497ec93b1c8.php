@@ -758,7 +758,13 @@
                             <li class="nav-item">
                                 <a href="<?php echo e(route('reports.prodi')); ?>" class="nav-link <?php echo e(request()->routeIs('reports.prodi') ? 'active' : ''); ?>">
                                     <i class="fas fa-chart-bar"></i>
-                                    <span>Reports</span>
+                                    <span>Reports Prodi</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('reports.spk-analysis')); ?>" class="nav-link <?php echo e(request()->routeIs('reports.spk-analysis*') ? 'active' : ''); ?>">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Reports Analisis SPK</span>
                                 </a>
                             </li>
                             <?php endif; ?>
@@ -795,12 +801,6 @@
                                 <a href="<?php echo e(route('spk.history')); ?>" class="nav-link <?php echo e(request()->routeIs('spk.history') ? 'active' : ''); ?>">
                                     <i class="fas fa-history"></i>
                                     <span>Riwayat Analisis</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('reports.prodi')); ?>" class="nav-link <?php echo e(request()->routeIs('reports.prodi') ? 'active' : ''); ?>">
-                                    <i class="fas fa-chart-bar"></i>
-                                    <span>Reports</span>
                                 </a>
                             </li>
                             <?php endif; ?>

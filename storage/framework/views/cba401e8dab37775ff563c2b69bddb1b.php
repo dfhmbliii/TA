@@ -83,7 +83,7 @@
             <p class="page-subtitle">Rekomendasi Program Studi berdasarkan minat, bakat, dan kemampuan Anda</p>
         </div>
 
-        @php
+        <?php
             $inputData = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
             $nilaiMapel = isset($inputData['nilai_mapel']) ? (is_array($inputData['nilai_mapel']) ? $inputData['nilai_mapel'] : json_decode($inputData['nilai_mapel'], true)) : [];
             $avgNilai = count($nilaiMapel) > 0 ? number_format(array_sum(array_map('floatval', $nilaiMapel)) / count($nilaiMapel), 2) : '-';
@@ -106,22 +106,22 @@
             }
             $prodiScore = isset($prodiRec['score']) ? floatval($prodiRec['score']) : $result->total_score;
             $scoreCategory = $prodiScore >= 80 ? 'Sangat Sesuai' : ($prodiScore >= 70 ? 'Sesuai' : ($prodiScore >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai'));
-        @endphp
+        ?>
 
         <div class="card">
             <div class="card-header">Rekomendasi Terbaik</div>
             <div class="recommendation">
                 <div>
-                    <p class="prodi-name">{{ $prodiRec['nama_prodi'] ?? 'Program Studi Belum Tersedia' }}</p>
-                    <p class="prodi-meta">{{ $prodiRec['nama_fakultas'] ?? ($prodiRec['kode_prodi'] ?? '') }}</p>
+                    <p class="prodi-name"><?php echo e($prodiRec['nama_prodi'] ?? 'Program Studi Belum Tersedia'); ?></p>
+                    <p class="prodi-meta"><?php echo e($prodiRec['nama_fakultas'] ?? ($prodiRec['kode_prodi'] ?? '')); ?></p>
                 </div>
                 <div class="score-grid">
                     <div class="score-box">
-                        <p class="score-value">{{ number_format($prodiScore, 2) }}</p>
+                        <p class="score-value"><?php echo e(number_format($prodiScore, 2)); ?></p>
                         <p class="score-label">Skor Total</p>
                     </div>
                     <div class="score-box">
-                        <span class="category-pill">{{ $scoreCategory }}</span>
+                        <span class="category-pill"><?php echo e($scoreCategory); ?></span>
                         <p class="score-label" style="margin-top:6px;">Kategori</p>
                     </div>
                 </div>
@@ -141,10 +141,10 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="badge badge-danger">{{ isset($inputData['minat']) ? ucwords(str_replace('_', ' ', $inputData['minat'])) : '-' }}</span></td>
-                        <td><span class="badge badge-warning">{{ isset($inputData['bakat']) ? ucwords(str_replace('_', ' ', $inputData['bakat'])) : '-' }}</span></td>
-                        <td><span class="badge badge-success">{{ isset($inputData['prospek_karir']) ? ucwords(str_replace('_', ' ', $inputData['prospek_karir'])) : '-' }}</span></td>
-                        <td><span class="badge badge-info">{{ $avgNilai }}</span></td>
+                        <td><span class="badge badge-danger"><?php echo e(isset($inputData['minat']) ? ucwords(str_replace('_', ' ', $inputData['minat'])) : '-'); ?></span></td>
+                        <td><span class="badge badge-warning"><?php echo e(isset($inputData['bakat']) ? ucwords(str_replace('_', ' ', $inputData['bakat'])) : '-'); ?></span></td>
+                        <td><span class="badge badge-success"><?php echo e(isset($inputData['prospek_karir']) ? ucwords(str_replace('_', ' ', $inputData['prospek_karir'])) : '-'); ?></span></td>
+                        <td><span class="badge badge-info"><?php echo e($avgNilai); ?></span></td>
                     </tr>
                 </tbody>
             </table>
@@ -153,16 +153,16 @@
         <div class="grid-2">
             <div class="card">
                 <div class="card-header">Ringkasan Skor</div>
-                <div class="list-row"><span class="muted-text">Total Skor</span><strong>{{ number_format($result->total_score, 2) }}</strong></div>
-                <div class="list-row"><span class="muted-text">Kategori</span><span class="category-pill">{{ $result->category }}</span></div>
-                <div class="list-row"><span class="muted-text">Tanggal Analisis</span><strong>{{ $result->created_at->format('d F Y, H:i') }}</strong></div>
+                <div class="list-row"><span class="muted-text">Total Skor</span><strong><?php echo e(number_format($result->total_score, 2)); ?></strong></div>
+                <div class="list-row"><span class="muted-text">Kategori</span><span class="category-pill"><?php echo e($result->category); ?></span></div>
+                <div class="list-row"><span class="muted-text">Tanggal Analisis</span><strong><?php echo e($result->created_at->format('d F Y, H:i')); ?></strong></div>
             </div>
             <div class="card">
                 <div class="card-header">Nilai Kriteria</div>
-                <div class="list-row"><span class="muted-text">Minat</span><strong>{{ $minatValue }}</strong></div>
-                <div class="list-row"><span class="muted-text">Bakat</span><strong>{{ $bakatValue }}</strong></div>
-                <div class="list-row"><span class="muted-text">Prospek Karir</span><strong>{{ $karirValue }}</strong></div>
-                <div class="list-row"><span class="muted-text">Akademik</span><strong>{{ $akademikValue }}</strong></div>
+                <div class="list-row"><span class="muted-text">Minat</span><strong><?php echo e($minatValue); ?></strong></div>
+                <div class="list-row"><span class="muted-text">Bakat</span><strong><?php echo e($bakatValue); ?></strong></div>
+                <div class="list-row"><span class="muted-text">Prospek Karir</span><strong><?php echo e($karirValue); ?></strong></div>
+                <div class="list-row"><span class="muted-text">Akademik</span><strong><?php echo e($akademikValue); ?></strong></div>
             </div>
         </div>
 
@@ -176,16 +176,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>Minat</td><td>{{ $minatWeight }}%</td></tr>
-                    <tr><td>Bakat</td><td>{{ $bakatWeight }}%</td></tr>
-                    <tr><td>Prospek Karir</td><td>{{ $karirWeight }}%</td></tr>
-                    <tr><td>Akademik</td><td>{{ $akademikWeight }}%</td></tr>
+                    <tr><td>Minat</td><td><?php echo e($minatWeight); ?>%</td></tr>
+                    <tr><td>Bakat</td><td><?php echo e($bakatWeight); ?>%</td></tr>
+                    <tr><td>Prospek Karir</td><td><?php echo e($karirWeight); ?>%</td></tr>
+                    <tr><td>Akademik</td><td><?php echo e($akademikWeight); ?>%</td></tr>
                     <tr><td><strong>Total</strong></td><td><strong>100%</strong></td></tr>
                 </tbody>
             </table>
         </div>
 
-        @if(isset($prodiRec['details']) && is_array($prodiRec['details']) && count($prodiRec['details']) > 0)
+        <?php if(isset($prodiRec['details']) && is_array($prodiRec['details']) && count($prodiRec['details']) > 0): ?>
         <div class="page-break"></div>
         <div class="card">
             <div class="card-header">Detail Skor Rekomendasi</div>
@@ -199,22 +199,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($prodiRec['details'] as $key => $detail)
+                    <?php $__currentLoopData = $prodiRec['details']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
-                        <td>{{ number_format($detail['score'] ?? 0, 2) }}</td>
-                        <td>{{ number_format(($detail['weight'] ?? 0) * 100, 0) }}%</td>
-                        <td>{{ number_format($detail['weighted'] ?? 0, 2) }}</td>
+                        <td><?php echo e(ucwords(str_replace('_', ' ', $key))); ?></td>
+                        <td><?php echo e(number_format($detail['score'] ?? 0, 2)); ?></td>
+                        <td><?php echo e(number_format(($detail['weight'] ?? 0) * 100, 0)); ?>%</td>
+                        <td><?php echo e(number_format($detail['weighted'] ?? 0, 2)); ?></td>
                     </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
-        @endif
+        <?php endif; ?>
 
         <div class="footer">
             Dokumen ini digenerate otomatis oleh sistem PILIHANKU<br>
-            © {{ date('Y') }} - Sistem Pendukung Keputusan Pemilihan Program Studi
+            © <?php echo e(date('Y')); ?> - Sistem Pendukung Keputusan Pemilihan Program Studi
         </div>
     </div>
 </body>
@@ -413,27 +413,27 @@
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">Nama Siswa</span>
-                    <span class="info-value">{{ $result->siswa->name }}</span>
+                    <span class="info-value"><?php echo e($result->siswa->name); ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">NISN</span>
-                    <span class="info-value">{{ $result->siswa->nisn }}</span>
+                    <span class="info-value"><?php echo e($result->siswa->nisn); ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Email</span>
-                    <span class="info-value">{{ $result->siswa->email }}</span>
+                    <span class="info-value"><?php echo e($result->siswa->email); ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Asal Sekolah</span>
-                    <span class="info-value">{{ $result->siswa->asal_sekolah ?? '-' }}</span>
+                    <span class="info-value"><?php echo e($result->siswa->asal_sekolah ?? '-'); ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Jurusan SMA/SMK</span>
-                    <span class="info-value">{{ $result->siswa->jurusan_sma ?? '-' }}</span>
+                    <span class="info-value"><?php echo e($result->siswa->jurusan_sma ?? '-'); ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Tanggal Analisis</span>
-                    <span class="info-value">{{ $result->created_at->format('d F Y, H:i') }}</span>
+                    <span class="info-value"><?php echo e($result->created_at->format('d F Y, H:i')); ?></span>
                 </div>
             </div>
         </div>
@@ -441,9 +441,10 @@
         <!-- Score Card -->
         <div class="score-card">
             <div class="score-label">TOTAL SKOR ANALISIS</div>
-            <div class="score-value">{{ number_format($result->total_score, 2) }}</div>
+            <div class="score-value"><?php echo e(number_format($result->total_score, 2)); ?></div>
             <span class="category-badge">
-                {{ $result->category }}
+                <?php echo e($result->category); ?>
+
             </span>
         </div>
 
@@ -459,16 +460,16 @@
                 </tr>
             </thead>
             <tbody>
-                @php
+                <?php
                     $inputData = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
                     $nilaiMapel = isset($inputData['nilai_mapel']) ? (is_array($inputData['nilai_mapel']) ? $inputData['nilai_mapel'] : json_decode($inputData['nilai_mapel'], true)) : [];
                     $avgNilai = count($nilaiMapel) > 0 ? number_format(array_sum(array_map('floatval', $nilaiMapel)) / count($nilaiMapel), 2) : '-';
-                @endphp
+                ?>
                 <tr>
-                    <td>{{ isset($inputData['minat']) ? ucwords(str_replace('_', ' ', $inputData['minat'])) : '-' }}</td>
-                    <td>{{ isset($inputData['bakat']) ? ucwords(str_replace('_', ' ', $inputData['bakat'])) : '-' }}</td>
-                    <td>{{ isset($inputData['prospek_karir']) ? ucwords(str_replace('_', ' ', $inputData['prospek_karir'])) : '-' }}</td>
-                    <td style="text-align: center; font-weight: 600; color: #5B6FFF;">{{ $avgNilai }}</td>
+                    <td><?php echo e(isset($inputData['minat']) ? ucwords(str_replace('_', ' ', $inputData['minat'])) : '-'); ?></td>
+                    <td><?php echo e(isset($inputData['bakat']) ? ucwords(str_replace('_', ' ', $inputData['bakat'])) : '-'); ?></td>
+                    <td><?php echo e(isset($inputData['prospek_karir']) ? ucwords(str_replace('_', ' ', $inputData['prospek_karir'])) : '-'); ?></td>
+                    <td style="text-align: center; font-weight: 600; color: #5B6FFF;"><?php echo e($avgNilai); ?></td>
                 </tr>
             </tbody>
         </table>
@@ -476,40 +477,40 @@
         <!-- Criteria Values Section -->
         <h2 class="section-title">Nilai Kriteria</h2>
         <div class="criteria-grid">
-            @if($result->criteria_values)
-            @php
+            <?php if($result->criteria_values): ?>
+            <?php
                 $criteriaValues = is_array($result->criteria_values) ? $result->criteria_values : json_decode($result->criteria_values, true);
                 // Set default values jika tidak ada
                 $minatValue = isset($criteriaValues['minat']) ? number_format($criteriaValues['minat'], 2) : '0.00';
                 $bakatValue = isset($criteriaValues['bakat']) ? number_format($criteriaValues['bakat'], 2) : '0.00';
                 $karirValue = isset($criteriaValues['prospek_karir']) ? number_format($criteriaValues['prospek_karir'], 2) : '0.00';
                 $akademikValue = isset($criteriaValues['akademik']) ? number_format($criteriaValues['akademik'], 2) : '0.00';
-            @endphp
+            ?>
             <div class="criteria-card">
                 <div class="criteria-icon">Minat</div>
                 <div class="criteria-label">Minat</div>
-                <div class="criteria-value">{{ $minatValue }}</div>
+                <div class="criteria-value"><?php echo e($minatValue); ?></div>
             </div>
             <div class="criteria-card">
                 <div class="criteria-icon">Bakat</div>
                 <div class="criteria-label">Bakat</div>
-                <div class="criteria-value">{{ $bakatValue }}</div>
+                <div class="criteria-value"><?php echo e($bakatValue); ?></div>
             </div>
             <div class="criteria-card">
                 <div class="criteria-icon">Karir</div>
                 <div class="criteria-label">Prospek Karir</div>
-                <div class="criteria-value">{{ $karirValue }}</div>
+                <div class="criteria-value"><?php echo e($karirValue); ?></div>
             </div>
             <div class="criteria-card">
                 <div class="criteria-icon">Akademik</div>
                 <div class="criteria-label">Akademik</div>
-                <div class="criteria-value">{{ $akademikValue }}</div>
+                <div class="criteria-value"><?php echo e($akademikValue); ?></div>
             </div>
-            @else
+            <?php else: ?>
             <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #999;">
                 Data kriteria tidak tersedia
             </div>
-            @endif
+            <?php endif; ?>
         </div>
 
         <!-- Weights Section -->
@@ -523,49 +524,49 @@
                 </tr>
             </thead>
             <tbody>
-                @if($result->weights)
-                @php
+                <?php if($result->weights): ?>
+                <?php
                     $weights = is_array($result->weights) ? $result->weights : json_decode($result->weights, true);
                     $minatWeight = isset($weights['minat']) ? floatval($weights['minat']) : 0;
                     $bakatWeight = isset($weights['bakat']) ? floatval($weights['bakat']) : 0;
                     $karirWeight = isset($weights['prospek_karir']) ? floatval($weights['prospek_karir']) : 0;
                     $akademikWeight = isset($weights['akademik']) ? floatval($weights['akademik']) : 0;
-                @endphp
+                ?>
                 <tr>
                     <td><strong>Minat</strong></td>
                     <td style="text-align: center;">
                         <div class="weight-bar">
-                            <div class="weight-bar-fill" style="width: {{ $minatWeight }}%"></div>
+                            <div class="weight-bar-fill" style="width: <?php echo e($minatWeight); ?>%"></div>
                         </div>
                     </td>
-                    <td style="text-align: right;"><strong>{{ $minatWeight }}%</strong></td>
+                    <td style="text-align: right;"><strong><?php echo e($minatWeight); ?>%</strong></td>
                 </tr>
                 <tr>
                     <td><strong>Bakat</strong></td>
                     <td style="text-align: center;">
                         <div class="weight-bar">
-                            <div class="weight-bar-fill" style="width: {{ $bakatWeight }}%"></div>
+                            <div class="weight-bar-fill" style="width: <?php echo e($bakatWeight); ?>%"></div>
                         </div>
                     </td>
-                    <td style="text-align: right;"><strong>{{ $bakatWeight }}%</strong></td>
+                    <td style="text-align: right;"><strong><?php echo e($bakatWeight); ?>%</strong></td>
                 </tr>
                 <tr>
                     <td><strong>Prospek Karir</strong></td>
                     <td style="text-align: center;">
                         <div class="weight-bar">
-                            <div class="weight-bar-fill" style="width: {{ $karirWeight }}%"></div>
+                            <div class="weight-bar-fill" style="width: <?php echo e($karirWeight); ?>%"></div>
                         </div>
                     </td>
-                    <td style="text-align: right;"><strong>{{ $karirWeight }}%</strong></td>
+                    <td style="text-align: right;"><strong><?php echo e($karirWeight); ?>%</strong></td>
                 </tr>
                 <tr>
                     <td><strong>Akademik</strong></td>
                     <td style="text-align: center;">
                         <div class="weight-bar">
-                            <div class="weight-bar-fill" style="width: {{ $akademikWeight }}%"></div>
+                            <div class="weight-bar-fill" style="width: <?php echo e($akademikWeight); ?>%"></div>
                         </div>
                     </td>
-                    <td style="text-align: right;"><strong>{{ $akademikWeight }}%</strong></td>
+                    <td style="text-align: right;"><strong><?php echo e($akademikWeight); ?>%</strong></td>
                 </tr>
                 <tr class="total-row">
                     <td><strong>Total</strong></td>
@@ -576,11 +577,11 @@
                     </td>
                     <td style="text-align: right;"><strong>100%</strong></td>
                 </tr>
-                @else
+                <?php else: ?>
                 <tr>
                     <td colspan="3" style="text-align: center; color: #999;">Data bobot tidak tersedia</td>
                 </tr>
-                @endif
+                <?php endif; ?>
             </tbody>
         </table>
 
@@ -588,48 +589,49 @@
         <div class="page-break"></div>
 
         <!-- Recommendation Section -->
-        @if($result->rekomendasi_prodi)
+        <?php if($result->rekomendasi_prodi): ?>
         <h2 class="section-title">Rekomendasi Program Studi</h2>
-        @php
+        <?php
             $prodiRec = $result->rekomendasi_prodi;
             if (is_string($prodiRec)) {
                 $prodiRec = json_decode($prodiRec, true);
             }
             $prodiScore = isset($prodiRec['score']) ? floatval($prodiRec['score']) : 0;
-        @endphp
+        ?>
         <div class="recommendation-card">
             <div class="recommendation-title">Program Studi Rekomendasi</div>
-            <div class="recommendation-prodi">{{ $prodiRec['nama_prodi'] ?? 'Program Studi Belum Tersedia' }}</div>
+            <div class="recommendation-prodi"><?php echo e($prodiRec['nama_prodi'] ?? 'Program Studi Belum Tersedia'); ?></div>
             
             <div class="recommendation-grid">
                 <div class="recommendation-stat">
                     <div class="recommendation-stat-label">Skor Kesesuaian</div>
-                    <div class="recommendation-stat-value">{{ number_format($prodiScore, 2) }}/100</div>
+                    <div class="recommendation-stat-value"><?php echo e(number_format($prodiScore, 2)); ?>/100</div>
                 </div>
                 <div class="recommendation-stat">
                     <div class="recommendation-stat-label">Tingkat Kesesuaian</div>
                     <div class="recommendation-stat-value">
-                        {{ $prodiScore >= 80 ? 'Sangat Sesuai' : ($prodiScore >= 70 ? 'Sesuai' : ($prodiScore >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai')) }}
+                        <?php echo e($prodiScore >= 80 ? 'Sangat Sesuai' : ($prodiScore >= 70 ? 'Sesuai' : ($prodiScore >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai'))); ?>
+
                     </div>
                 </div>
             </div>
 
-            @if(isset($prodiRec['details']) && is_array($prodiRec['details']))
+            <?php if(isset($prodiRec['details']) && is_array($prodiRec['details'])): ?>
             <div class="details-grid">
-                @foreach($prodiRec['details'] as $key => $detail)
+                <?php $__currentLoopData = $prodiRec['details']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="detail-item">
-                    <div class="detail-label">{{ ucwords(str_replace('_', ' ', $key)) }}</div>
-                    <div class="detail-value">{{ number_format($detail['weighted'] ?? 0, 2) }}</div>
-                    <div style="font-size: 10px; margin-top: 5px; opacity: 0.8;">Nilai: {{ number_format($detail['score'] ?? 0, 2) }} • Weight: {{ number_format(($detail['weight'] ?? 0) * 100, 0) }}%</div>
+                    <div class="detail-label"><?php echo e(ucwords(str_replace('_', ' ', $key))); ?></div>
+                    <div class="detail-value"><?php echo e(number_format($detail['weighted'] ?? 0, 2)); ?></div>
+                    <div style="font-size: 10px; margin-top: 5px; opacity: 0.8;">Nilai: <?php echo e(number_format($detail['score'] ?? 0, 2)); ?> • Weight: <?php echo e(number_format(($detail['weight'] ?? 0) * 100, 0)); ?>%</div>
                     <div class="score-bar">
-                        <div class="score-bar-fill" style="width: {{ min($detail['score'] ?? 0, 100) }}%"></div>
+                        <div class="score-bar-fill" style="width: <?php echo e(min($detail['score'] ?? 0, 100)); ?>%"></div>
                     </div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
-        @endif
+        <?php endif; ?>
 
         <!-- Footer -->
         <div class="footer">
@@ -637,9 +639,10 @@
                 Dokumen ini digenerate otomatis oleh sistem PILIHANKU
             </div>
             <div class="footer-note">
-                © {{ date('Y') }} - Sistem Pendukung Keputusan Pemilihan Program Studi
+                © <?php echo e(date('Y')); ?> - Sistem Pendukung Keputusan Pemilihan Program Studi
             </div>
         </div>
     </div>
 </body>
 </html>
+<?php /**PATH C:\laragon\tugas_akhir\resources\views/pdf/spk-result.blade.php ENDPATH**/ ?>

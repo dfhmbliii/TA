@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\GoogleAuthController;
 
 // Authentication Routes
@@ -136,6 +137,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/spk/karir/initialize', [App\Http\Controllers\KarirAnalysisController::class, 'initialize'])->name('spk.karir.initialize');
         Route::post('/spk/karir/pairwise', [App\Http\Controllers\KarirAnalysisController::class, 'storePairwise'])->name('spk.karir.store-pairwise');
         Route::post('/spk/karir/apply-weights', [App\Http\Controllers\KarirAnalysisController::class, 'applyWeights'])->name('spk.karir.apply-weights');
+
+        // Reports (Admin Only)
+        Route::get('/reports/spk-analysis', [ReportsController::class, 'spkAnalysis'])->name('reports.spk-analysis');
+        Route::get('/reports/spk-analysis/data', [ReportsController::class, 'getSpkAnalysisData'])->name('reports.spk-analysis.data');
+        Route::get('/reports/spk-analysis/{id}/detail', [ReportsController::class, 'getSpkAnalysisDetail'])->name('reports.spk-analysis.detail');
     });
 
     // Prodi View (accessible by all authenticated users - Read Only)
@@ -145,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
     // SPK Analysis History (accessible by siswa)
     Route::get('/spk/history', [App\Http\Controllers\SiswaDashboardController::class, 'history'])->name('spk.history');
     Route::get('/spk/result/{id}/export-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'exportPdf'])->name('spk.export-pdf');
+    Route::get('/spk/result/{id}/view-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'viewPdf'])->name('spk.view-pdf');
 
     // In-app Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');

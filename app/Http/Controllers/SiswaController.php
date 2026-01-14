@@ -32,7 +32,7 @@ class SiswaController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'nisn' => ['required', 'string', 'max:50', 'unique:siswas,nisn'],
-            'email' => ['required', 'email', 'unique:siswas,email'],
+            'email' => ['required', 'email', 'unique:siswas,email', 'unique:users,email'],
             'jurusan_sma' => ['required', 'string', 'max:255'],
             'asal_sekolah' => ['required', 'string', 'max:255'],
             'tahun_lulus' => ['required', 'digits:4'],
@@ -44,8 +44,18 @@ class SiswaController extends Controller
             'kreativitas' => ['nullable', 'numeric', 'between:0,100'],
         ]);
 
-        \App\Models\Siswa::create($data);
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan.');
+        // Create siswa record
+        $siswa = \App\Models\Siswa::create($data);
+        
+        // Create user account with NISN as default password
+        \App\Models\User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['nisn']),
+            'role' => 'siswa',
+        ]);
+        
+        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan. Password default: ' . $data['nisn']);
     }
 
     /**

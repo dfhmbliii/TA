@@ -45,9 +45,8 @@ class RegisterController extends Controller
             'tahun_lulus' => $request->tahun_lulus,
         ]);
 
-        Auth::login($user);
-
-        return redirect()->route('siswa.dashboard')
-            ->with('success', 'Selamat datang! Akun Anda berhasil dibuat.');
+        // Redirect to login instead of auto login
+        return redirect()->route('login')
+            ->with('success', 'Selamat! Akun Anda berhasil dibuat. Silakan login untuk melanjutkan.');
     }
 }

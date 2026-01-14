@@ -48,4 +48,9 @@ class Siswa extends Model
     {
         return $this->belongsTo(Prodi::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
+    }
 }

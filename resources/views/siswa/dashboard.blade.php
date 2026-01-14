@@ -105,6 +105,7 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Tanggal</th>
                                 <th>Total Skor</th>
                                 <th>Kategori</th>
@@ -113,8 +114,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($spkResults as $result)
+                            @foreach($spkResults->take(5) as $index => $result)
                             <tr>
+                                <td>{{ $index + 1 }}</td>
                                 <td>
                                     <i class="fas fa-calendar-alt me-2 text-muted"></i>
                                     {{ $result->created_at->format('d M Y, H:i') }}
@@ -123,99 +125,50 @@
                                     <strong class="text-primary">{{ number_format($result->total_score, 2) }}</strong>
                                 </td>
                                 <td>
-                                    <span class="badge bg-{{ $result->category == 'Sangat Baik' ? 'success' : ($result->category == 'Baik' ? 'primary' : ($result->category == 'Cukup' ? 'info' : 'warning')) }}">
+                                    <span class="badge bg-{{ $result->category == 'Sangat Sesuai' ? 'success' : ($result->category == 'Sesuai' ? 'primary' : ($result->category == 'Cukup Sesuai' ? 'info' : 'warning')) }}">
                                         {{ $result->category }}
                                     </span>
                                 </td>
                                 <td>
                                     <small class="text-muted">
-                                        @if($result->criteria_values)
-                                            IPK: {{ $result->criteria_values['ipk'] ?? '-' }}, 
-                                            Prestasi: {{ $result->criteria_values['prestasi_score'] ?? '-' }}, 
-                                            Kepemimpinan: {{ $result->criteria_values['kepemimpinan'] ?? '-' }}
+                                        @php
+                                            $input = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
+                                        @endphp
+                                        @if($input && is_array($input))
+                                            Minat: {{ ucwords(str_replace('_', ' ', $input['minat'] ?? '-')) }}, 
+                                            Bakat: {{ ucwords(str_replace('_', ' ', $input['bakat'] ?? '-')) }}
                                         @else
                                             -
                                         @endif
                                     </small>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detailModal{{ $result->id }}">
+                                    <button class="btn btn-sm btn-outline-primary" data-detail-btn 
+                                        data-result-id="{{ $result->id }}" 
+                                        data-total-score="{{ $result->total_score }}" 
+                                        data-category="{{ $result->category }}" 
+                                        data-input="{{ json_encode($result->input_data) }}" 
+                                        data-created="{{ $result->created_at->format('d F Y, H:i:s') }}">
                                         <i class="fas fa-eye me-1"></i>
                                         Detail
                                     </button>
-                                    <a href="{{ route('spk.export-pdf', $result->id) }}" class="btn btn-sm btn-outline-success">
+                                    <a href="{{ route('spk.view-pdf', $result->id) }}" target="_blank" class="btn btn-sm btn-outline-info">
                                         <i class="fas fa-file-pdf me-1"></i>
-                                        PDF
+                                        View
+                                    </a>
+                                    <a href="{{ route('spk.export-pdf', $result->id) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download me-1"></i>
+                                        Download
                                     </a>
                                 </td>
                             </tr>
-
-                            <!-- Detail Modal -->
-                            <div class="modal fade" id="detailModal{{ $result->id }}" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Detail Analisis SPK</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Tanggal Analisis</label>
-                                                <p>{{ $result->created_at->format('d F Y, H:i:s') }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Total Skor</label>
-                                                <h4 class="text-primary">{{ number_format($result->total_score, 4) }}</h4>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Kategori</label>
-                                                <p>
-                                                    <span class="badge bg-{{ $result->category == 'Sangat Baik' ? 'success' : ($result->category == 'Baik' ? 'primary' : ($result->category == 'Cukup' ? 'info' : 'warning')) }} fs-6">
-                                                        {{ $result->category }}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                            <hr>
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Nilai Kriteria</label>
-                                                @if($result->criteria_values)
-                                                <ul class="list-unstyled">
-                                                    <li><i class="fas fa-star text-warning me-2"></i> IPK: <strong>{{ $result->criteria_values['ipk'] ?? '-' }}</strong></li>
-                                                    <li><i class="fas fa-trophy text-success me-2"></i> Prestasi: <strong>{{ $result->criteria_values['prestasi_score'] ?? '-' }}</strong></li>
-                                                    <li><i class="fas fa-users text-primary me-2"></i> Kepemimpinan: <strong>{{ $result->criteria_values['kepemimpinan'] ?? '-' }}</strong></li>
-                                                    <li><i class="fas fa-handshake text-info me-2"></i> Sosial: <strong>{{ $result->criteria_values['sosial'] ?? '-' }}</strong></li>
-                                                    <li><i class="fas fa-comments text-secondary me-2"></i> Komunikasi: <strong>{{ $result->criteria_values['komunikasi'] ?? '-' }}</strong></li>
-                                                    <li><i class="fas fa-lightbulb text-warning me-2"></i> Kreativitas: <strong>{{ $result->criteria_values['kreativitas'] ?? '-' }}</strong></li>
-                                                </ul>
-                                                @endif
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">Bobot Kriteria</label>
-                                                @if($result->weights)
-                                                <ul class="list-unstyled">
-                                                    <li>IPK: <strong>{{ $result->weights['ipk'] ?? '-' }}%</strong></li>
-                                                    <li>Prestasi: <strong>{{ $result->weights['prestasi_score'] ?? '-' }}%</strong></li>
-                                                    <li>Kepemimpinan: <strong>{{ $result->weights['kepemimpinan'] ?? '-' }}%</strong></li>
-                                                    <li>Sosial: <strong>{{ $result->weights['sosial'] ?? '-' }}%</strong></li>
-                                                    <li>Komunikasi: <strong>{{ $result->weights['komunikasi'] ?? '-' }}%</strong></li>
-                                                    <li>Kreativitas: <strong>{{ $result->weights['kreativitas'] ?? '-' }}%</strong></li>
-                                                </ul>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                @if($spkResults->count() >= 5)
+                @if($spkResults->count() > 5)
                 <div class="text-center mt-3">
-                    <a href="{{ route('spk.index') }}" class="btn btn-outline-primary">
+                    <a href="{{ route('spk.history') }}" class="btn btn-outline-primary">
                         <i class="fas fa-history me-2"></i>
                         Lihat Semua Riwayat
                     </a>
@@ -225,6 +178,87 @@
         </div>
     </div>
     @endif
+
+    <!-- Single Detail Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-chart-bar me-2"></i>Detail Analisis SPK</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 2rem;">
+                    
+                    <!-- Summary Card -->
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="text-muted mb-3"><i class="fas fa-calendar me-2"></i>Tanggal Analisis</h6>
+                                    <p id="modalCreatedDate" class="mb-4 fs-6">-</p>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted mb-2">Total Skor</h6>
+                                            <h3 class="text-success mb-0" id="modalTotalScore">-</h3>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted mb-2">Kategori</h6>
+                                            <div id="modalCategory">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <i class="fas fa-chart-pie text-primary" style="font-size: 4rem; opacity: 0.15;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Input Section -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Data Input Anda</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div>
+                                        <small class="text-muted d-block mb-2">Minat</small>
+                                        <span class="badge bg-danger fs-6" id="modalInputMinat">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div>
+                                        <small class="text-muted d-block mb-2">Bakat</small>
+                                        <span class="badge bg-warning text-dark fs-6" id="modalInputBakat">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div>
+                                        <small class="text-muted d-block mb-2">Prospek Karir</small>
+                                        <span class="badge bg-success fs-6" id="modalInputKarir">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div>
+                                        <small class="text-muted d-block mb-2">Nilai Rata-rata</small>
+                                        <span class="badge bg-info fs-6" id="modalInputNilai">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Quick Links -->
     <div class="col-12">
@@ -276,3 +310,72 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+    
+    document.querySelectorAll('[data-detail-btn]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            try {
+                const totalScore = this.getAttribute('data-total-score');
+                const category = this.getAttribute('data-category');
+                const inputData = JSON.parse(this.getAttribute('data-input') || '{}');
+                const created = this.getAttribute('data-created');
+                
+                // Update modal content
+                document.getElementById('modalCreatedDate').textContent = created;
+                document.getElementById('modalTotalScore').textContent = parseFloat(totalScore).toFixed(2);
+                
+                // Category badge
+                const categoryBadge = `<span class="badge bg-${
+                    category === 'Sangat Sesuai' ? 'success' : 
+                    (category === 'Sesuai' ? 'primary' : 
+                    (category === 'Cukup Sesuai' ? 'info' : 'warning'))
+                } fs-6 px-3 py-2">${category}</span>`;
+                document.getElementById('modalCategory').innerHTML = categoryBadge;
+                
+                // Populate input data
+                if (inputData && Object.keys(inputData).length > 0) {
+                    const minatText = inputData['minat'] ? 
+                        inputData['minat'].charAt(0).toUpperCase() + inputData['minat'].slice(1).replace(/_/g, ' ') : '-';
+                    document.getElementById('modalInputMinat').textContent = minatText;
+                    
+                    const bakatText = inputData['bakat'] ? 
+                        inputData['bakat'].charAt(0).toUpperCase() + inputData['bakat'].slice(1).replace(/_/g, ' ') : '-';
+                    document.getElementById('modalInputBakat').textContent = bakatText;
+                    
+                    const karirText = inputData['prospek_karir'] ? 
+                        inputData['prospek_karir'].charAt(0).toUpperCase() + inputData['prospek_karir'].slice(1).replace(/_/g, ' ') : '-';
+                    document.getElementById('modalInputKarir').textContent = karirText;
+                    
+                    // Calculate average nilai
+                    if (inputData['nilai_mapel']) {
+                        const nilaiMapel = inputData['nilai_mapel'];
+                        const values = Object.values(nilaiMapel).map(v => parseFloat(v) || 0);
+                        const avg = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : '-';
+                        document.getElementById('modalInputNilai').textContent = avg;
+                    } else {
+                        document.getElementById('modalInputNilai').textContent = '-';
+                    }
+                } else {
+                    document.getElementById('modalInputMinat').textContent = '-';
+                    document.getElementById('modalInputBakat').textContent = '-';
+                    document.getElementById('modalInputKarir').textContent = '-';
+                    document.getElementById('modalInputNilai').textContent = '-';
+                }
+                
+                // Show modal
+                detailModal.show();
+            } catch (error) {
+                console.error('Error parsing data:', error);
+                alert('Terjadi kesalahan saat memuat detail.');
+            }
+        });
+    });
+});
+</script>
+@endpush

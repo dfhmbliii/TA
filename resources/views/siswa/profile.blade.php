@@ -86,7 +86,7 @@
                                 @enderror
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="email" class="form-label">
@@ -100,6 +100,85 @@
                                        value="{{ old('email', Auth::user()->email) }}" 
                                        required>
                                 @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nisn" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    NISN
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('nisn') is-invalid @enderror"
+                                       id="nisn"
+                                       name="nisn"
+                                       value="{{ old('nisn', $siswa->nisn ?? '') }}"
+                                       required>
+                                @error('nisn')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="jurusan_sma" class="form-label">
+                                    <i class="fas fa-school me-1"></i>
+                                    Jurusan SMA/SMK
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('jurusan_sma') is-invalid @enderror"
+                                       id="jurusan_sma"
+                                       name="jurusan_sma"
+                                       value="{{ old('jurusan_sma', $siswa->jurusan_sma ?? '') }}"
+                                       placeholder="Contoh: IPA, IPS, Teknik Komputer"
+                                       required>
+                                @error('jurusan_sma')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="asal_sekolah" class="form-label">
+                                    <i class="fas fa-university me-1"></i>
+                                    Asal Sekolah
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('asal_sekolah') is-invalid @enderror"
+                                       id="asal_sekolah"
+                                       name="asal_sekolah"
+                                       value="{{ old('asal_sekolah', $siswa->asal_sekolah ?? '') }}"
+                                       placeholder="Nama sekolah lengkap"
+                                       required>
+                                @error('asal_sekolah')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="tahun_lulus" class="form-label">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Tahun Lulus
+                                </label>
+                                <input type="text"
+                                       class="form-control @error('tahun_lulus') is-invalid @enderror"
+                                       id="tahun_lulus"
+                                       name="tahun_lulus"
+                                       value="{{ old('tahun_lulus', $siswa->tahun_lulus ?? '') }}"
+                                       placeholder="2023"
+                                       required>
+                                @error('tahun_lulus')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -124,7 +203,7 @@
                                 @enderror
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="birth_date" class="form-label">

@@ -86,4 +86,20 @@ class User extends Authenticatable implements CanResetPasswordContract
     {
         return in_array($this->role, ['siswa', 'mahasiswa']);
     }
+
+    public function siswaProfile()
+    {
+        return $this->hasOne(Siswa::class, 'email', 'email');
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }

@@ -103,7 +103,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="email" class="form-label">
@@ -124,6 +124,141 @@ unset($__errorArgs, $__bag); ?>"
                                        value="<?php echo e(old('email', Auth::user()->email)); ?>" 
                                        required>
                                 <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nisn" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    NISN
+                                </label>
+                                <input type="text"
+                                       class="form-control <?php $__errorArgs = ['nisn'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       id="nisn"
+                                       name="nisn"
+                                       value="<?php echo e(old('nisn', $siswa->nisn ?? '')); ?>"
+                                       required>
+                                <?php $__errorArgs = ['nisn'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="jurusan_sma" class="form-label">
+                                    <i class="fas fa-school me-1"></i>
+                                    Jurusan SMA/SMK
+                                </label>
+                                <input type="text"
+                                       class="form-control <?php $__errorArgs = ['jurusan_sma'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       id="jurusan_sma"
+                                       name="jurusan_sma"
+                                       value="<?php echo e(old('jurusan_sma', $siswa->jurusan_sma ?? '')); ?>"
+                                       placeholder="Contoh: IPA, IPS, Teknik Komputer"
+                                       required>
+                                <?php $__errorArgs = ['jurusan_sma'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="asal_sekolah" class="form-label">
+                                    <i class="fas fa-university me-1"></i>
+                                    Asal Sekolah
+                                </label>
+                                <input type="text"
+                                       class="form-control <?php $__errorArgs = ['asal_sekolah'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       id="asal_sekolah"
+                                       name="asal_sekolah"
+                                       value="<?php echo e(old('asal_sekolah', $siswa->asal_sekolah ?? '')); ?>"
+                                       placeholder="Nama sekolah lengkap"
+                                       required>
+                                <?php $__errorArgs = ['asal_sekolah'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="tahun_lulus" class="form-label">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Tahun Lulus
+                                </label>
+                                <input type="text"
+                                       class="form-control <?php $__errorArgs = ['tahun_lulus'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                       id="tahun_lulus"
+                                       name="tahun_lulus"
+                                       value="<?php echo e(old('tahun_lulus', $siswa->tahun_lulus ?? '')); ?>"
+                                       placeholder="2023"
+                                       required>
+                                <?php $__errorArgs = ['tahun_lulus'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -169,7 +304,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="birth_date" class="form-label">

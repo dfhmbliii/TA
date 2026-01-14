@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Mail\AnnouncementMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -23,9 +24,9 @@ class Notify
 
         if ($emailIfPref && ($user->email_notifications ?? false)) {
             try {
-                Mail::raw($message, function($m) use ($user, $title) {
-                    $m->to($user->email)->subject($title);
-                });
+                Mail::to($user->email)->send(
+                    new AnnouncementMail($title, $message, $user->name, $type)
+                );
             } catch (\Throwable $e) {
                 Log::warning('Email notify failed: '.$e->getMessage());
             }

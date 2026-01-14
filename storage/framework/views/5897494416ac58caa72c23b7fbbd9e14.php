@@ -1,14 +1,12 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Riwayat Analisis SPK'); ?>
 
-@section('title', 'Riwayat Analisis SPK')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="content-header">
     <h1>Riwayat Analisis SPK</h1>
     <p>Lihat semua hasil analisis SPK yang pernah dilakukan</p>
 </div>
 
-@if($spkResults->count() > 0)
+<?php if($spkResults->count() > 0): ?>
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0">
@@ -30,57 +28,61 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($spkResults as $index => $result)
+                    <?php $__currentLoopData = $spkResults; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $result): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ ($spkResults->currentPage() - 1) * $spkResults->perPage() + $index + 1 }}</td>
+                        <td><?php echo e(($spkResults->currentPage() - 1) * $spkResults->perPage() + $index + 1); ?></td>
                         <td>
                             <i class="fas fa-calendar-alt me-2 text-muted"></i>
-                            {{ $result->created_at->format('d M Y, H:i') }}
+                            <?php echo e($result->created_at->format('d M Y, H:i')); ?>
+
                         </td>
                         <td>
-                            <strong class="text-primary">{{ number_format($result->total_score, 2) }}</strong>
+                            <strong class="text-primary"><?php echo e(number_format($result->total_score, 2)); ?></strong>
                         </td>
                         <td>
-                            <span class="badge bg-{{ $result->category == 'Sangat Baik' ? 'success' : ($result->category == 'Baik' ? 'primary' : ($result->category == 'Cukup' ? 'info' : 'warning')) }}">
-                                {{ $result->category }}
+                            <span class="badge bg-<?php echo e($result->category == 'Sangat Baik' ? 'success' : ($result->category == 'Baik' ? 'primary' : ($result->category == 'Cukup' ? 'info' : 'warning'))); ?>">
+                                <?php echo e($result->category); ?>
+
                             </span>
                         </td>
                         <td>
                             <small class="text-muted">
-                                @php
+                                <?php
                                     $input = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
-                                @endphp
-                                @if($input && is_array($input))
-                                    Minat: {{ ucwords(str_replace('_', ' ', $input['minat'] ?? '-')) }}, 
-                                    Bakat: {{ ucwords(str_replace('_', ' ', $input['bakat'] ?? '-')) }}
-                                @else
+                                ?>
+                                <?php if($input && is_array($input)): ?>
+                                    Minat: <?php echo e(ucwords(str_replace('_', ' ', $input['minat'] ?? '-'))); ?>, 
+                                    Bakat: <?php echo e(ucwords(str_replace('_', ' ', $input['bakat'] ?? '-'))); ?>
+
+                                <?php else: ?>
                                     -
-                                @endif
+                                <?php endif; ?>
                             </small>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary" data-detail-btn data-result-id="{{ $result->id }}" data-total-score="{{ $result->total_score }}" data-category="{{ $result->category }}" data-input="{{ json_encode($result->input_data) }}" data-created="{{ $result->created_at->format('d F Y, H:i:s') }}">
+                            <button class="btn btn-sm btn-outline-primary" data-detail-btn data-result-id="<?php echo e($result->id); ?>" data-total-score="<?php echo e($result->total_score); ?>" data-category="<?php echo e($result->category); ?>" data-input="<?php echo e(json_encode($result->input_data)); ?>" data-created="<?php echo e($result->created_at->format('d F Y, H:i:s')); ?>">
                                 <i class="fas fa-eye me-1"></i>
                                 Detail
                             </button>
-                            <a href="{{ route('spk.view-pdf', $result->id) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                            <a href="<?php echo e(route('spk.view-pdf', $result->id)); ?>" target="_blank" class="btn btn-sm btn-outline-info">
                                 <i class="fas fa-file-pdf me-1"></i>
                                 View
                             </a>
-                            <a href="{{ route('spk.export-pdf', $result->id) }}" class="btn btn-sm btn-outline-success">
+                            <a href="<?php echo e(route('spk.export-pdf', $result->id)); ?>" class="btn btn-sm btn-outline-success">
                                 <i class="fas fa-download me-1"></i>
                                 Download
                             </a>
                         </td>
                     </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
         
         <!-- Pagination -->
         <div class="d-flex justify-content-center mt-4">
-            {{ $spkResults->links() }}
+            <?php echo e($spkResults->links()); ?>
+
         </div>
     </div>
 </div>
@@ -225,17 +227,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@else
+<?php else: ?>
 <div class="card">
     <div class="card-body text-center py-5">
         <i class="fas fa-history fa-4x text-muted mb-3"></i>
         <h5>Belum Ada Riwayat Analisis</h5>
         <p class="text-muted mb-4">Anda belum pernah melakukan analisis SPK</p>
-        <a href="{{ route('siswa-spk.form') }}" class="btn btn-primary">
+        <a href="<?php echo e(route('siswa-spk.form')); ?>" class="btn btn-primary">
             <i class="fas fa-play me-2"></i>
             Mulai Analisis Sekarang
         </a>
     </div>
 </div>
-@endif
-@endsection
+<?php endif; ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\tugas_akhir\resources\views/siswa/history.blade.php ENDPATH**/ ?>

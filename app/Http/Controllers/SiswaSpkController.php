@@ -164,7 +164,17 @@ class SiswaSpkController extends Controller
                     $kriteriaScore = $this->calculateKriteriaScore($k->kode_kriteria, $kriteriaValue, $prodi, $data['nilai_mapel'] ?? []);
 
                     $score += $kriteriaScore * $k->bobot;
-                    $details[strtolower($k->nama_kriteria)] = [
+                    // Use consistent key mapping for criteria
+                    $criteriaKeyMap = [
+                        'MINAT' => 'minat',
+                        'BAKAT' => 'bakat',
+                        'PROSPEK_KARIR' => 'prospek_karir',
+                        'AKADEMIK' => 'akademik',
+                        'NILAI' => 'nilai'
+                    ];
+                    $detailKey = $criteriaKeyMap[$k->kode_kriteria] ?? strtolower($k->kode_kriteria);
+                    
+                    $details[$detailKey] = [
                         'score' => $kriteriaScore,
                         'weight' => $k->bobot,
                         'weighted' => $kriteriaScore * $k->bobot
@@ -188,12 +198,53 @@ class SiswaSpkController extends Controller
         if (count($prodiScores) > 0) {
             $topProdi = $prodiScores[0];
 
+            // Prepare criteria_values and weights from details with proper key mapping
+            $criteriaValues = [];
+            $weights = [];
+            
+            // Mapping dari kode kriteria ke field name untuk view/pdf
+            $criteriaFieldMap = [
+                'minat' => 'minat',
+                'bakat' => 'bakat',
+                'prospek_karir' => 'prospek_karir',
+                'akademik' => 'akademik',
+                'nilai' => 'nilai',
+                'ipk' => 'ipk',
+                'prestasi' => 'prestasi_score',
+                'kepemimpinan' => 'kepemimpinan',
+                'sosial' => 'sosial',
+                'komunikasi' => 'komunikasi',
+                'kreativitas' => 'kreativitas'
+            ];
+            
+            foreach ($topProdi['details'] as $key => $detail) {
+                // Map key to standard field name
+                $mappedKey = $criteriaFieldMap[$key] ?? $key;
+                $criteriaValues[$mappedKey] = $detail['score'];
+                $weights[$mappedKey] = round($detail['weight'] * 100, 2); // Convert to percentage
+            }
+
+            // Prepare input data for storage
+            $inputData = [
+                'minat' => $data['kriteria_minat'] ?? null,
+                'bakat' => $data['kriteria_bakat'] ?? null,
+                'prospek_karir' => $data['kriteria_prospek_karir'] ?? null,
+                'nilai_mapel' => $data['nilai_mapel'] ?? []
+            ];
+
             SpkResult::create([
                 'siswa_id' => $siswa->id,
                 'total_score' => $topProdi['score'],
                 'category' => $this->getCategory($topProdi['score']),
-                'rekomendasi_prodi' => $topProdi['prodi']->nama_prodi,
-                'criteria_breakdown' => json_encode($topProdi['details'])
+                'rekomendasi_prodi' => json_encode([
+                    'nama_prodi' => $topProdi['prodi']->nama_prodi,
+                    'score' => $topProdi['score'],
+                    'details' => $topProdi['details']
+                ]),
+                'criteria_breakdown' => json_encode($topProdi['details']),
+                'criteria_values' => json_encode($criteriaValues),
+                'weights' => json_encode($weights),
+                'input_data' => json_encode($inputData)
             ]);
         }
 

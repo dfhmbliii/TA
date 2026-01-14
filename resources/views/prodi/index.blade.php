@@ -139,6 +139,21 @@ function getFakultasColor($fakultas) {
             <form action="{{ route('prodi.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Terjadi Kesalahan Validasi
+                            </h6>
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-3">
@@ -146,7 +161,10 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-graduation-cap me-1"></i>
                                     Nama Program Studi
                                 </label>
-                                <input type="text" class="form-control" id="nama_prodi" name="nama_prodi" required placeholder="Masukkan nama program studi">
+                                <input type="text" class="form-control @error('nama_prodi') is-invalid @enderror" id="nama_prodi" name="nama_prodi" value="{{ old('nama_prodi') }}" required placeholder="Masukkan nama program studi">
+                                @error('nama_prodi')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                                 <div class="form-text">Nama lengkap program studi</div>
                             </div>
                         </div>
@@ -156,7 +174,10 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-university me-1"></i>
                                     Nama Fakultas
                                 </label>
-                                <input type="text" class="form-control" id="nama_fakultas" name="nama_fakultas" required placeholder="Masukkan nama fakultas">
+                                <input type="text" class="form-control @error('nama_fakultas') is-invalid @enderror" id="nama_fakultas" name="nama_fakultas" value="{{ old('nama_fakultas') }}" required placeholder="Masukkan nama fakultas">
+                                @error('nama_fakultas')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                                 <div class="form-text">Nama fakultas program studi</div>
                             </div>
                         </div>
@@ -166,7 +187,10 @@ function getFakultasColor($fakultas) {
                                     <i class="fas fa-code me-1"></i>
                                     Kode Program Studi
                                 </label>
-                                <input type="text" class="form-control" id="kode_prodi" name="kode_prodi" required placeholder="Contoh: TI, SI, MI">
+                                <input type="text" class="form-control @error('kode_prodi') is-invalid @enderror" id="kode_prodi" name="kode_prodi" value="{{ old('kode_prodi') }}" required placeholder="Contoh: TI, SI, MI">
+                                @error('kode_prodi')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                                 <div class="form-text">Kode singkat program studi</div>
                             </div>
                         </div>
@@ -177,7 +201,10 @@ function getFakultasColor($fakultas) {
                             <i class="fas fa-info-circle me-1"></i>
                             Deskripsi Program Studi
                         </label>
-                        <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan deskripsi program studi"></textarea>
+                        <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" rows="4" placeholder="Masukkan deskripsi program studi">{{ old('deskripsi') }}</textarea>
+                        @error('deskripsi')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                         <div class="form-text">Deskripsi lengkap tentang program studi</div>
                     </div>
                 </div>
@@ -336,6 +363,10 @@ function getFakultasColor($fakultas) {
 
     // Show any error messages in modals if they exist
     @if($errors->any())
+        document.addEventListener('DOMContentLoaded', function() {
+            const createModal = new bootstrap.Modal(document.getElementById('createProdiModal'));
+            createModal.show();
+        });
         @if(session('editProdiId'))
             // Reopen modal with the prodi ID that had validation errors
             editProdi({{ session('editProdiId') }});
