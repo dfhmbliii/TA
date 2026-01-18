@@ -165,13 +165,11 @@
                                                     <?php if($c1->id == $c2->id): ?>
                                                         <span class="badge bg-secondary">1</span>
                                                     <?php elseif($c1->id < $c2->id): ?>
-                                                        <input type="number"
+                                                        <input type="text"
                                                                class="form-control form-control-sm text-center matrix-input"
                                                                name="comparisons[<?php echo e($c1->id); ?>_<?php echo e($c2->id); ?>][nilai]"
                                                                value="<?php echo e($matrix[$c1->id][$c2->id] ?? 1); ?>"
-                                                               step="0.001"
-                                                               min="0.10"
-                                                               max="9"
+                                                               inputmode="decimal"
                                                                data-row="<?php echo e($c1->id); ?>"
                                                                data-col="<?php echo e($c2->id); ?>"
                                                                style="width: 80px; display: inline-block;">
@@ -179,7 +177,7 @@
                                                         <input type="hidden" name="comparisons[<?php echo e($c1->id); ?>_<?php echo e($c2->id); ?>][category_2_id]" value="<?php echo e($c2->id); ?>">
                                                     <?php else: ?>
                                                         <span class="badge bg-info reciprocal" data-row="<?php echo e($c1->id); ?>" data-col="<?php echo e($c2->id); ?>">
-                                                            <?php echo e($matrix[$c1->id][$c2->id] ? number_format($matrix[$c1->id][$c2->id], 2) : '1.00'); ?>
+                                                            <?php echo e($matrix[$c1->id][$c2->id] ? number_format($matrix[$c1->id][$c2->id], 3, '.', '') : '1.000'); ?>
 
                                                         </span>
                                                     <?php endif; ?>

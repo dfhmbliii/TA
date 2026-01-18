@@ -144,14 +144,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reports/spk-analysis/{id}/detail', [ReportsController::class, 'getSpkAnalysisDetail'])->name('reports.spk-analysis.detail');
     });
 
+    // SPK Analysis History (accessible by siswa)
+    Route::middleware(['check.role:siswa'])->group(function () {
+        Route::get('/spk/history', [App\Http\Controllers\SiswaDashboardController::class, 'history'])->name('spk.history');
+        Route::get('/spk/result/{id}/export-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'exportPdf'])->name('spk.export-pdf');
+        Route::get('/spk/result/{id}/view-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'viewPdf'])->name('spk.view-pdf');
+        Route::get('/spk/result/{id}/rekomendasi', [App\Http\Controllers\SiswaDashboardController::class, 'getRekomendasiProdi'])->name('spk.rekomendasi');
+        Route::get('/spk/result/{id}/detail', [App\Http\Controllers\SiswaDashboardController::class, 'getDetailAnalysis'])->name('spk.detail');
+    });
+
     // Prodi View (accessible by all authenticated users - Read Only)
     Route::get('/prodi', [ProdiController::class, 'index'])->name('prodi.index');
     Route::get('/prodi/{prodi}', [ProdiController::class, 'show'])->name('prodi.show');
-
-    // SPK Analysis History (accessible by siswa)
-    Route::get('/spk/history', [App\Http\Controllers\SiswaDashboardController::class, 'history'])->name('spk.history');
-    Route::get('/spk/result/{id}/export-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'exportPdf'])->name('spk.export-pdf');
-    Route::get('/spk/result/{id}/view-pdf', [App\Http\Controllers\SiswaDashboardController::class, 'viewPdf'])->name('spk.view-pdf');
 
     // In-app Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');

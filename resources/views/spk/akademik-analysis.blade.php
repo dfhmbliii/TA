@@ -161,17 +161,17 @@
                                                     @if($c1->id == $c2->id)
                                                         <span class="badge bg-secondary">1</span>
                                                     @elseif($c1->id < $c2->id)
-                                                        <input type="number" class="form-control form-control-sm text-center matrix-input"
+                                                        <input type="text" class="form-control form-control-sm text-center matrix-input"
                                                                name="comparisons[{{ $c1->id }}_{{ $c2->id }}][nilai]"
                                                                value="{{ $matrix[$c1->id][$c2->id] ?? 1 }}"
-                                                               step="0.001" min="0.10" max="9"
+                                                               inputmode="decimal"
                                                                data-row="{{ $c1->id }}" data-col="{{ $c2->id }}"
                                                                style="width: 80px; display: inline-block;">
                                                         <input type="hidden" name="comparisons[{{ $c1->id }}_{{ $c2->id }}][category_1_id]" value="{{ $c1->id }}">
                                                         <input type="hidden" name="comparisons[{{ $c1->id }}_{{ $c2->id }}][category_2_id]" value="{{ $c2->id }}">
                                                     @else
                                                         <span class="badge bg-info reciprocal" data-row="{{ $c1->id }}" data-col="{{ $c2->id }}">
-                                                            {{ $matrix[$c1->id][$c2->id] ? number_format($matrix[$c1->id][$c2->id], 2) : '1.00' }}
+                                                            {{ $matrix[$c1->id][$c2->id] ? number_format($matrix[$c1->id][$c2->id], 3, '.', '') : '1.000' }}
                                                         </span>
                                                     @endif
                                                 </td>

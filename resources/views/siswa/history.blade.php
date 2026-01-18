@@ -41,7 +41,11 @@
                             <strong class="text-primary">{{ number_format($result->total_score, 2) }}</strong>
                         </td>
                         <td>
-                            <span class="badge bg-{{ $result->category == 'Sangat Baik' ? 'success' : ($result->category == 'Baik' ? 'primary' : ($result->category == 'Cukup' ? 'info' : 'warning')) }}">
+                            <span class="badge bg-{{ 
+                                $result->total_score >= 35 ? 'success' : 
+                                ($result->total_score >= 28 ? 'primary' : 
+                                ($result->total_score >= 20 ? 'info' : 'warning')) 
+                            }}">
                                 {{ $result->category }}
                             </span>
                         </td>
@@ -59,7 +63,11 @@
                             </small>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary" data-detail-btn data-result-id="{{ $result->id }}" data-total-score="{{ $result->total_score }}" data-category="{{ $result->category }}" data-input="{{ json_encode($result->input_data) }}" data-created="{{ $result->created_at->format('d F Y, H:i:s') }}">
+                            <button class="btn btn-sm btn-outline-primary" data-detail-btn 
+                                data-result-id="{{ $result->id }}" 
+                                data-total-score="{{ $result->total_score }}" 
+                                data-category="{{ $result->category }}" 
+                                data-created="{{ $result->created_at->format('d F Y, H:i:s') }}">
                                 <i class="fas fa-eye me-1"></i>
                                 Detail
                             </button>
@@ -80,7 +88,7 @@
         
         <!-- Pagination -->
         <div class="d-flex justify-content-center mt-4">
-            {{ $spkResults->links() }}
+            {{ $spkResults->links('pagination::bootstrap-5') }}
         </div>
     </div>
 </div>
@@ -122,7 +130,7 @@
                 </div>
 
                 <!-- Data Input Section -->
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-light">
                         <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Data Input Anda</h6>
                     </div>
@@ -156,6 +164,18 @@
                     </div>
                 </div>
 
+                <!-- Rekomendasi Prodi Section -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Rekomendasi Program Studi</h6>
+                    </div>
+                    <div class="card-body" id="modalRekomendasiProdi">
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Memuat rekomendasi...
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -173,9 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             try {
+                const resultId = this.getAttribute('data-result-id');
                 const totalScore = this.getAttribute('data-total-score');
                 const category = this.getAttribute('data-category');
-                const inputData = JSON.parse(this.getAttribute('data-input') || '{}');
                 const created = this.getAttribute('data-created');
                 
                 // Update modal content
@@ -184,39 +204,132 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Category badge with better styling
                 const categoryBadge = `<span class="badge bg-${
-                    category === 'Sangat Baik' ? 'success' : 
-                    (category === 'Baik' ? 'primary' : 
-                    (category === 'Cukup' ? 'info' : 'warning'))
+                    category === 'Sangat Sesuai' ? 'success' : 
+                    (category === 'Sesuai' ? 'primary' : 
+                    (category === 'Cukup Sesuai' ? 'info' : 'warning'))
                 } fs-6 px-3 py-2">${category}</span>`;
                 document.getElementById('modalCategory').innerHTML = categoryBadge;
                 
-                // Populate input data dengan badge
-                if (inputData && Object.keys(inputData).length > 0) {
-                    const minatText = inputData['minat'] ? 
-                        inputData['minat'].charAt(0).toUpperCase() + inputData['minat'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputMinat').textContent = minatText;
-                    
-                    const bakatText = inputData['bakat'] ? 
-                        inputData['bakat'].charAt(0).toUpperCase() + inputData['bakat'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputBakat').textContent = bakatText;
-                    
-                    const karirText = inputData['prospek_karir'] ? 
-                        inputData['prospek_karir'].charAt(0).toUpperCase() + inputData['prospek_karir'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputKarir').textContent = karirText;
-                    
-                    // Calculate average nilai_mapel
-                    if (inputData['nilai_mapel'] && Array.isArray(inputData['nilai_mapel'])) {
-                        const nilaiArray = inputData['nilai_mapel'].map(n => parseFloat(n)).filter(n => !isNaN(n));
-                        if (nilaiArray.length > 0) {
-                            const avgNilai = nilaiArray.reduce((a, b) => a + b, 0) / nilaiArray.length;
-                            document.getElementById('modalInputNilai').textContent = avgNilai.toFixed(2);
-                        }
-                    }
-                }
-                
-                // Show modal
+                // Show modal first
                 const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                 modal.show();
+                
+                // Fetch detail data (input + rekomendasi) from server
+                const rekomendasiContainer = document.getElementById('modalRekomendasiProdi');
+                rekomendasiContainer.innerHTML = `
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Memuat data...
+                    </div>
+                `;
+                
+                // Fetch detail analysis
+                fetch(`/spk/result/${resultId}/detail`)
+                    .then(response => {
+                        console.log('Detail response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Detail response data:', data);
+                        if (data.success && data.data && data.data.input_data) {
+                            const inputData = data.data.input_data;
+                            console.log('Input data from server:', inputData);
+                            
+                            // Populate input data dengan badge
+                            if (inputData && typeof inputData === 'object' && Object.keys(inputData).length > 0) {
+                                const minatText = inputData['minat'] ? 
+                                    inputData['minat'].charAt(0).toUpperCase() + inputData['minat'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputMinat').textContent = minatText;
+                                console.log('Set minat to:', minatText);
+                                
+                                const bakatText = inputData['bakat'] ? 
+                                    inputData['bakat'].charAt(0).toUpperCase() + inputData['bakat'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputBakat').textContent = bakatText;
+                                console.log('Set bakat to:', bakatText);
+                                
+                                const karirText = inputData['prospek_karir'] ? 
+                                    inputData['prospek_karir'].charAt(0).toUpperCase() + inputData['prospek_karir'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputKarir').textContent = karirText;
+                                console.log('Set karir to:', karirText);
+                                
+                                // Calculate average nilai_mapel
+                                if (inputData['nilai_mapel'] && typeof inputData['nilai_mapel'] === 'object') {
+                                    const nilaiArray = Object.values(inputData['nilai_mapel'])
+                                        .map(n => parseFloat(n))
+                                        .filter(n => !isNaN(n));
+                                    
+                                    if (nilaiArray.length > 0) {
+                                        const avgNilai = nilaiArray.reduce((a, b) => a + b, 0) / nilaiArray.length;
+                                        document.getElementById('modalInputNilai').textContent = avgNilai.toFixed(2);
+                                        console.log('Set nilai to:', avgNilai.toFixed(2));
+                                    } else {
+                                        document.getElementById('modalInputNilai').textContent = '-';
+                                    }
+                                } else {
+                                    document.getElementById('modalInputNilai').textContent = '-';
+                                }
+                            } else {
+                                console.log('Input data is empty or not an object');
+                                document.getElementById('modalInputMinat').textContent = '-';
+                                document.getElementById('modalInputBakat').textContent = '-';
+                                document.getElementById('modalInputKarir').textContent = '-';
+                                document.getElementById('modalInputNilai').textContent = '-';
+                            }
+                        } else {
+                            console.error('Failed to fetch detail data:', data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching detail:', error);
+                    });
+                
+                // Fetch rekomendasi prodi
+                fetch(`/spk/result/${resultId}/rekomendasi`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.rekomendasi && data.rekomendasi.length > 0) {
+                            let html = '<div class="list-group list-group-flush">';
+                            data.rekomendasi.forEach((prodi, index) => {
+                                html += `
+                                    <div class="list-group-item px-0 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="badge bg-primary rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                                                    ${index + 1}
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">${prodi.nama_prodi || prodi.name || 'N/A'}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-chart-line me-1"></i>
+                                                    Skor: <strong>${prodi.score ? parseFloat(prodi.score).toFixed(2) : 'N/A'}</strong>
+                                                    ${prodi.percentage ? `(${parseFloat(prodi.percentage).toFixed(1)}%)` : ''}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            html += '</div>';
+                            rekomendasiContainer.innerHTML = html;
+                        } else {
+                            rekomendasiContainer.innerHTML = `
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                                    <p class="mb-0">Tidak ada rekomendasi program studi tersedia</p>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching rekomendasi:', error);
+                        rekomendasiContainer.innerHTML = `
+                            <div class="text-center text-danger py-4">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                <p class="mb-0">Gagal memuat rekomendasi program studi</p>
+                            </div>
+                        `;
+                    });
+                
             } catch (error) {
                 console.error('Error showing detail modal:', error);
                 alert('Gagal menampilkan detail analisis');

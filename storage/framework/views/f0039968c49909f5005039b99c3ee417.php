@@ -24,12 +24,12 @@
                             <div class="vr"></div>
                             <div>
                                 <h5 class="mb-0">
-                                    <span class="badge bg-<?php echo e($prodiScores[0]['score'] >= 80 ? 'success' : 
-                                        ($prodiScores[0]['score'] >= 70 ? 'primary' : 
-                                        ($prodiScores[0]['score'] >= 60 ? 'info' : 'warning'))); ?> px-3 py-2">
-                                        <?php echo e($prodiScores[0]['score'] >= 80 ? 'Sangat Sesuai' : 
-                                            ($prodiScores[0]['score'] >= 70 ? 'Sesuai' : 
-                                            ($prodiScores[0]['score'] >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai'))); ?>
+                                    <span class="badge bg-<?php echo e($prodiScores[0]['score'] >= 35 ? 'success' : 
+                                        ($prodiScores[0]['score'] >= 28 ? 'primary' : 
+                                        ($prodiScores[0]['score'] >= 20 ? 'info' : 'warning'))); ?> px-3 py-2">
+                                        <?php echo e($prodiScores[0]['score'] >= 35 ? 'Sangat Sesuai' : 
+                                            ($prodiScores[0]['score'] >= 28 ? 'Sesuai' : 
+                                            ($prodiScores[0]['score'] >= 20 ? 'Cukup Sesuai' : 'Kurang Sesuai'))); ?>
 
                                     </span>
                                 </h5>
@@ -156,12 +156,12 @@
                                     </h5>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-<?php echo e($item['score'] >= 80 ? 'success' : 
-                                        ($item['score'] >= 70 ? 'primary' : 
-                                        ($item['score'] >= 60 ? 'info' : 'warning'))); ?>">
-                                        <?php echo e($item['score'] >= 80 ? 'Sangat Sesuai' : 
-                                            ($item['score'] >= 70 ? 'Sesuai' : 
-                                            ($item['score'] >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai'))); ?>
+                                    <span class="badge bg-<?php echo e($item['score'] >= 35 ? 'success' : 
+                                        ($item['score'] >= 28 ? 'primary' : 
+                                        ($item['score'] >= 20 ? 'info' : 'warning'))); ?>">
+                                        <?php echo e($item['score'] >= 35 ? 'Sangat Sesuai' : 
+                                            ($item['score'] >= 28 ? 'Sesuai' : 
+                                            ($item['score'] >= 20 ? 'Cukup Sesuai' : 'Kurang Sesuai'))); ?>
 
                                     </span>
                                 </td>
@@ -241,8 +241,19 @@
     }
     
     @media print {
-        .btn, .content-header p, .card-header .btn {
+        .btn, .content-header p, .card-header .btn, 
+        .d-flex.gap-2.justify-content-center,
+        button[onclick="window.print()"] {
             display: none !important;
+        }
+        
+        body {
+            background: white;
+        }
+        
+        .card {
+            box-shadow: none !important;
+            page-break-inside: avoid;
         }
     }
 </style>

@@ -183,9 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td class="text-center"><strong>${item.total_score}</strong></td>
                 <td class="text-center">
                     <span class="badge bg-${
-                        item.category === 'Sangat Baik' ? 'success' : 
-                        (item.category === 'Baik' ? 'primary' : 
-                        (item.category === 'Cukup' ? 'info' : 'warning'))
+                        item.total_score >= 35 ? 'success' : 
+                        (item.total_score >= 28 ? 'primary' : 
+                        (item.total_score >= 20 ? 'info' : 'warning'))
                     }">
                         ${item.category}
                     </span>
@@ -262,9 +262,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const categoryBadge = document.getElementById('modalCategory');
             categoryBadge.className = `badge bg-${
-                item.category === 'Sangat Baik' ? 'success' : 
-                (item.category === 'Baik' ? 'primary' : 
-                (item.category === 'Cukup' ? 'info' : 'warning'))
+                item.total_score >= 35 ? 'success' : 
+                (item.total_score >= 28 ? 'primary' : 
+                (item.total_score >= 20 ? 'info' : 'warning'))
             }`;
             categoryBadge.textContent = item.category;
 

@@ -1,0 +1,9 @@
+cd c:\laragon\tugas_akhir
+$prodis = App\Models\Prodi::with(['alternatives' => function($q) { $q->orderBy('urutan'); }])->limit(2)->get();
+foreach($prodis as $p) { 
+  echo $p->nama_prodi . ":\n";
+  foreach($p->alternatives as $a) {
+    echo "  - " . $a->nama_alternatif . "\n";
+  }
+}
+exit;

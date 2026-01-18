@@ -21,6 +21,22 @@
                 <form action="{{ route('siswa-spk.calculate') }}" method="POST" id="spkForm">
                     @csrf
                     
+                    <!-- Validation Errors -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger border-0 alert-dismissible fade show" role="alert">
+                            <h4 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Ada Kesalahan
+                            </h4>
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    
                     <!-- Alert Info -->
                     <div class="alert alert-info border-0">
                         <i class="fas fa-info-circle me-2"></i>

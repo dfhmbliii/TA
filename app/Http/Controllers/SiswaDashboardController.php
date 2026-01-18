@@ -86,4 +86,73 @@ class SiswaDashboardController extends Controller
         
         return $pdf->stream();
     }
+    
+    public function getRekomendasiProdi($id)
+    {
+        $result = SpkResult::findOrFail($id);
+        
+        // Check if user has access to this result
+        if (in_array(Auth::user()->role, ['siswa', 'mahasiswa'])) {
+            $siswa = Siswa::where('email', Auth::user()->email)->first();
+            if (!$siswa || $result->siswa_id !== $siswa->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+        }
+        
+        // Get rekomendasi prodi from result
+        $rekomendasi = [];
+        $rekomendasiData = $result->rekomendasi_prodi;
+        
+        if ($rekomendasiData) {
+            // Ensure it's decoded if it's a string
+            if (is_string($rekomendasiData)) {
+                $rekomendasiData = json_decode($rekomendasiData, true);
+            }
+            
+            if (is_array($rekomendasiData) && json_last_error() === JSON_ERROR_NONE) {
+                $rekomendasi = $rekomendasiData;
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'rekomendasi' => $rekomendasi
+        ]);
+    }
+    
+    public function getDetailAnalysis($id)
+    {
+        $result = SpkResult::findOrFail($id);
+        
+        // Check if user has access to this result
+        if (in_array(Auth::user()->role, ['siswa', 'mahasiswa'])) {
+            $siswa = Siswa::where('email', Auth::user()->email)->first();
+            if (!$siswa || $result->siswa_id !== $siswa->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ], 403);
+            }
+        }
+        
+        // Ensure input_data is properly decoded
+        $inputData = $result->input_data;
+        if (is_string($inputData)) {
+            $inputData = json_decode($inputData, true);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $result->id,
+                'total_score' => $result->total_score,
+                'category' => $result->category,
+                'created_at' => $result->created_at->format('d F Y, H:i:s'),
+                'input_data' => $inputData
+            ]
+        ]);
+    }
 }

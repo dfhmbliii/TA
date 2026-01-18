@@ -23,12 +23,31 @@ class SpkResult extends Model
     protected $casts = [
         'weights' => 'array',
         'criteria_values' => 'array',
-        'input_data' => 'array',
         'total_score' => 'float',
     ];
 
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
+    }
+    
+    /**
+     * Accessor untuk input_data - ensure always array
+     */
+    protected function inputData(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => is_string($value) ? json_decode($value, true) ?? [] : ($value ?? []),
+        );
+    }
+    
+    /**
+     * Accessor untuk rekomendasi_prodi - ensure always array
+     */
+    protected function rekomendasiProdi(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => is_string($value) ? json_decode($value, true) ?? [] : ($value ?? []),
+        );
     }
 }

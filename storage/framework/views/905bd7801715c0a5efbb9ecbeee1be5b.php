@@ -19,6 +19,22 @@
                 <form action="<?php echo e(route('siswa-spk.calculate')); ?>" method="POST" id="spkForm">
                     <?php echo csrf_field(); ?>
                     
+                    <!-- Validation Errors -->
+                    <?php if($errors->any()): ?>
+                        <div class="alert alert-danger border-0 alert-dismissible fade show" role="alert">
+                            <h4 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Ada Kesalahan
+                            </h4>
+                            <ul class="mb-0">
+                                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <li><?php echo e($error); ?></li>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+                    
                     <!-- Alert Info -->
                     <div class="alert alert-info border-0">
                         <i class="fas fa-info-circle me-2"></i>

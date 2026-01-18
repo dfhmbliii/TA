@@ -50,7 +50,7 @@
 
     <div class="card">
         <div class="card-body">
-            <canvas id="prodiChart" height="120"></canvas>
+            <canvas id="prodiChart" height="80"></canvas>
         </div>
     </div>
 </div>
@@ -59,37 +59,77 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-(function(){
-    const ctx = document.getElementById('prodiChart').getContext('2d');
+document.addEventListener('DOMContentLoaded', function(){
+    const canvas = document.getElementById('prodiChart');
+    if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+    }
+    const ctx = canvas.getContext('2d');
     let chart;
 
-    function randomColor(i){
-        const colors = [
-            '#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ac'
-        ];
-        return colors[i % colors.length];
-    }
+    function buildBarChart(series){
+        // Group totals per prodi (registered vs recommendation), same as dashboard
+        const prodiData = {};
 
-    function buildChart(years, series){
-        const datasets = series.map((s, idx) => ({
-            label: s.label,
-            data: s.data,
-            borderColor: randomColor(idx),
-            backgroundColor: randomColor(idx)+'33',
-            tension: 0.2,
-        }));
-        const data = { labels: years, datasets };
+        series.forEach(item => {
+            const prodiName = item.label
+                .replace(' (Terdaftar)', '')
+                .replace(' (Rekomendasi SPK)', '');
+
+            if (!prodiData[prodiName]) {
+                prodiData[prodiName] = { registered: 0, recommended: 0 };
+            }
+
+            const total = item.data.reduce((a, b) => a + b, 0);
+            if (item.type === 'registered') {
+                prodiData[prodiName].registered = total;
+            } else if (item.type === 'recommendation') {
+                prodiData[prodiName].recommended = total;
+            }
+        });
+
+        const labels = Object.keys(prodiData);
+        const registeredData = labels.map(label => prodiData[label].registered);
+        const recommendedData = labels.map(label => prodiData[label].recommended);
+
+        const data = {
+            labels,
+            datasets: [
+                {
+                    label: 'Siswa Terdaftar',
+                    data: registeredData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Rekomendasi SPK',
+                    data: recommendedData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        };
+
         const options = {
             responsive: true,
-            interaction: { mode: 'nearest', intersect: false },
+            maintainAspectRatio: true,
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: { callbacks: { label: (ctx)=> `${ctx.dataset.label}: ${ctx.formattedValue}` } }
+                legend: { position: 'top' },
+                title: { display: false }
             },
-            scales: { y: { beginAtZero: true, ticks: { precision:0 } } }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
         };
+
         if (chart) { chart.destroy(); }
-        chart = new Chart(ctx, { type: 'line', data, options });
+        chart = new Chart(ctx, { type: 'bar', data, options });
     }
 
     async function fetchData(params){
@@ -107,18 +147,20 @@
             prodi_id: document.getElementById('prodiFilter').value,
             includeEmpty: document.getElementById('includeEmpty').checked
         };
-        const json = await fetchData(params);
-        buildChart(json.years, json.series);
-        // update export link
+        try {
+            const json = await fetchData(params);
+            buildBarChart(json.series);
+        } catch(error) {
+            console.error('Error loading chart:', error);
+            document.querySelector('#prodiChart').parentElement.innerHTML = '<div class="alert alert-danger">Gagal memuat grafik</div>';
+        }
         const exportUrl = new URL("{{ route('reports.prodi.export') }}", window.location.origin);
         Object.entries(params).forEach(([k,v])=>{ if(v!=='' && v!=null){ exportUrl.searchParams.set(k,v); } });
         document.getElementById('exportCsvBtn').href = exportUrl.toString();
     }
 
     document.getElementById('filterForm').addEventListener('submit', function(e){ e.preventDefault(); refresh(); });
-
-    // initial
     refresh();
-})();
+});
 </script>
 @endpush

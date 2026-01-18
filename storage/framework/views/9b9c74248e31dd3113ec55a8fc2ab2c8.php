@@ -192,13 +192,11 @@
                                                     <?php if($k1->id == $k2->id): ?>
                                                         <span class="badge bg-secondary">1</span>
                                                     <?php elseif($k1->id < $k2->id): ?>
-                                                        <input type="number"
+                                                        <input type="text"
                                                             class="form-control form-control-sm text-center matrix-input"
                                                             name="comparisons[<?php echo e($k1->id); ?>_<?php echo e($k2->id); ?>][nilai]"
                                                             value="<?php echo e($matrix[$k1->id][$k2->id] ?? 1); ?>"
-                                                            step="0.001"
-                                                            min="0.10"
-                                                            max="9"
+                                                            inputmode="decimal"
                                                             data-row="<?php echo e($k1->id); ?>"
                                                             data-col="<?php echo e($k2->id); ?>"
                                                             style="width: 80px; display: inline-block;">
@@ -206,7 +204,7 @@
                                                         <input type="hidden" name="comparisons[<?php echo e($k1->id); ?>_<?php echo e($k2->id); ?>][kriteria_2_id]" value="<?php echo e($k2->id); ?>">
                                                     <?php else: ?>
                                                         <span class="badge bg-info reciprocal" data-row="<?php echo e($k1->id); ?>" data-col="<?php echo e($k2->id); ?>">
-                                                            <?php echo e($matrix[$k1->id][$k2->id] ? number_format($matrix[$k1->id][$k2->id], 2) : '1.00'); ?>
+                                                            <?php echo e($matrix[$k1->id][$k2->id] ? number_format($matrix[$k1->id][$k2->id], 3, '.', '') : '1.000'); ?>
 
                                                         </span>
                                                     <?php endif; ?>
@@ -249,6 +247,51 @@
         </div>
     </div>
 </div>
+
+<?php $__env->startPush('styles'); ?>
+<style>
+/* Completely hide number input spinner buttons */
+.matrix-input,
+input.matrix-input,
+input[type="number"].matrix-input {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    -ms-appearance: none !important;
+    padding-right: 4px !important;
+    overflow: hidden !important;
+}
+
+/* Target all pseudo-elements that create spinners */
+.matrix-input::-webkit-outer-spin-button,
+.matrix-input::-webkit-inner-spin-button,
+input.matrix-input::-webkit-outer-spin-button,
+input.matrix-input::-webkit-inner-spin-button,
+input[type="number"].matrix-input::-webkit-outer-spin-button,
+input[type="number"].matrix-input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    border: none !important;
+    background: none !important;
+}
+
+/* Firefox */
+.matrix-input[type="number"]::-moz-number-spin-box {
+    display: none !important;
+}
+
+.matrix-input[type="number"] {
+    -moz-appearance: textfield !important;
+}
+</style>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->startPush('scripts'); ?>
 <script>
@@ -303,7 +346,7 @@ document.querySelectorAll('.matrix-input').forEach(input => {
         if (reciprocal) {
             const recip = 1 / value;
             const snapped = snapToAHPScale(recip);
-            reciprocal.textContent = Number(snapped).toFixed(2);
+            reciprocal.textContent = Number(snapped).toFixed(3);
         }
 
         // Update row totals
@@ -332,7 +375,7 @@ document.querySelectorAll('.matrix-input').forEach(input => {
         if (reciprocal) {
             const recip = 1 / value;
             const snapped = snapToAHPScale(recip);
-            reciprocal.textContent = Number(snapped).toFixed(2);
+            reciprocal.textContent = Number(snapped).toFixed(3);
         }
 
         updateRowTotal(row);
@@ -357,7 +400,7 @@ function updateRowTotal(rowId) {
 
     const totalCell = document.querySelector(`.row-total[data-row="${rowId}"]`);
     if (totalCell) {
-        totalCell.textContent = total.toFixed(2);
+        totalCell.textContent = total.toFixed(3);
     }
 }
 

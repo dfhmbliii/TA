@@ -113,7 +113,7 @@ class SiswaSpkController extends Controller
     }
 
     /**
-     * Calculate SPK recommendation for siswa
+     * Calculate SPK recommendation for siswa using AHP weights
      */
     public function calculate(Request $request)
     {
@@ -124,11 +124,12 @@ class SiswaSpkController extends Controller
             'nilai_mapel.*' => 'required|numeric|min:0|max:100',
         ];
 
-        // Add validation for each kriteria dynamically (exclude Akademik/Nilai)
+        // Add validation for each kriteria dynamically
         foreach ($kriteria as $k) {
             if (in_array($k->kode_kriteria, ['AKADEMIK','NILAI'])) {
                 continue;
             }
+            
             $fieldName = 'kriteria_' . strtolower($k->kode_kriteria);
             $validationRules[$fieldName] = 'required|string';
         }
@@ -146,6 +147,12 @@ class SiswaSpkController extends Controller
             $q->orderBy('urutan');
         }])->get();
 
+        // Load AHP categories with weights from database
+        $minatCategories = MinatCategory::orderBy('urutan')->get()->keyBy('kode');
+        $bakatCategories = BakatCategory::orderBy('urutan')->get()->keyBy('kode');
+        $karirCategories = KarirCategory::orderBy('urutan')->get()->keyBy('kode');
+        $akademikCategories = AkademikCategory::orderBy('urutan')->get()->keyBy('kode');
+
         $prodiScores = [];
 
         foreach ($prodis as $prodi) {
@@ -154,27 +161,36 @@ class SiswaSpkController extends Controller
 
             // Calculate score for each kriteria dynamically
             foreach ($kriteria as $k) {
+                $kriteriaValue = null;
+                $kriteriaScore = 0;
+                
+                // Get field name
                 $fieldName = 'kriteria_' . strtolower($k->kode_kriteria);
-                $kriteriaValue = $data[$fieldName] ?? null;
-
-                // For Akademik/Nilai, use nilai_mapel inputs; otherwise, use selected value
-                if ($k->kode_kriteria === 'AKADEMIK' || $k->kode_kriteria === 'NILAI') {
+                
+                if ($k->kode_kriteria === 'MINAT') {
+                    $kriteriaValue = $data[$fieldName] ?? null;
+                    $kriteriaScore = $this->getMinatScoreWithWeights($kriteriaValue, $prodi, $minatCategories);
+                } elseif ($k->kode_kriteria === 'BAKAT') {
+                    $kriteriaValue = $data[$fieldName] ?? null;
+                    $kriteriaScore = $this->getBakatScoreWithWeights($kriteriaValue, $prodi, $bakatCategories);
+                } elseif ($k->kode_kriteria === 'KARIR') {
+                    $kriteriaValue = $data[$fieldName] ?? null;
+                    $kriteriaScore = $this->getProspekScoreWithWeights($kriteriaValue, $prodi, $karirCategories);
+                } elseif ($k->kode_kriteria === 'AKADEMIK') {
                     $kriteriaScore = $this->getNilaiAkademikScore($data['nilai_mapel'] ?? [], $prodi);
-                } elseif ($kriteriaValue) {
-                    $kriteriaScore = $this->calculateKriteriaScore($k->kode_kriteria, $kriteriaValue, $prodi, $data['nilai_mapel'] ?? []);
+                }
 
+                // Add to total score using kriteria bobot (AHP weight from database)
+                if ($kriteriaScore > 0 || $k->kode_kriteria === 'AKADEMIK') {
                     $score += $kriteriaScore * $k->bobot;
-                    // Use consistent key mapping for criteria
-                    $criteriaKeyMap = [
-                        'MINAT' => 'minat',
-                        'BAKAT' => 'bakat',
-                        'PROSPEK_KARIR' => 'prospek_karir',
-                        'AKADEMIK' => 'akademik',
-                        'NILAI' => 'nilai'
-                    ];
-                    $detailKey = $criteriaKeyMap[$k->kode_kriteria] ?? strtolower($k->kode_kriteria);
                     
-                    $details[$detailKey] = [
+                    // Store detailed breakdown
+                    $criteriaKey = strtolower($k->kode_kriteria);
+                    if ($k->kode_kriteria === 'KARIR') {
+                        $criteriaKey = 'prospek_karir';
+                    }
+                    
+                    $details[$criteriaKey] = [
                         'score' => $kriteriaScore,
                         'weight' => $k->bobot,
                         'weighted' => $kriteriaScore * $k->bobot
@@ -198,49 +214,40 @@ class SiswaSpkController extends Controller
         if (count($prodiScores) > 0) {
             $topProdi = $prodiScores[0];
 
-            // Prepare criteria_values and weights from details with proper key mapping
+            // Prepare criteria_values and weights from details
             $criteriaValues = [];
             $weights = [];
             
-            // Mapping dari kode kriteria ke field name untuk view/pdf
-            $criteriaFieldMap = [
-                'minat' => 'minat',
-                'bakat' => 'bakat',
-                'prospek_karir' => 'prospek_karir',
-                'akademik' => 'akademik',
-                'nilai' => 'nilai',
-                'ipk' => 'ipk',
-                'prestasi' => 'prestasi_score',
-                'kepemimpinan' => 'kepemimpinan',
-                'sosial' => 'sosial',
-                'komunikasi' => 'komunikasi',
-                'kreativitas' => 'kreativitas'
-            ];
-            
             foreach ($topProdi['details'] as $key => $detail) {
-                // Map key to standard field name
-                $mappedKey = $criteriaFieldMap[$key] ?? $key;
-                $criteriaValues[$mappedKey] = $detail['score'];
-                $weights[$mappedKey] = round($detail['weight'] * 100, 2); // Convert to percentage
+                $criteriaValues[$key] = $detail['score'];
+                $weights[$key] = round($detail['weight'] * 100, 2); // Convert to percentage
             }
 
             // Prepare input data for storage
             $inputData = [
                 'minat' => $data['kriteria_minat'] ?? null,
                 'bakat' => $data['kriteria_bakat'] ?? null,
-                'prospek_karir' => $data['kriteria_prospek_karir'] ?? null,
+                'prospek_karir' => $data['kriteria_karir'] ?? null,
                 'nilai_mapel' => $data['nilai_mapel'] ?? []
             ];
+
+            // Prepare all prodi recommendations (top 5)
+            $rekomendasiProdi = [];
+            $topProdiScores = array_slice($prodiScores, 0, 5);
+            foreach ($topProdiScores as $index => $prodiScore) {
+                $rekomendasiProdi[] = [
+                    'nama_prodi' => $prodiScore['prodi']->nama_prodi,
+                    'score' => $prodiScore['score'],
+                    'percentage' => ($prodiScore['score'] / ($topProdi['score'] ?: 1)) * 100,
+                    'rank' => $index + 1
+                ];
+            }
 
             SpkResult::create([
                 'siswa_id' => $siswa->id,
                 'total_score' => $topProdi['score'],
                 'category' => $this->getCategory($topProdi['score']),
-                'rekomendasi_prodi' => json_encode([
-                    'nama_prodi' => $topProdi['prodi']->nama_prodi,
-                    'score' => $topProdi['score'],
-                    'details' => $topProdi['details']
-                ]),
+                'rekomendasi_prodi' => json_encode($rekomendasiProdi),
                 'criteria_breakdown' => json_encode($topProdi['details']),
                 'criteria_values' => json_encode($criteriaValues),
                 'weights' => json_encode($weights),
@@ -252,131 +259,286 @@ class SiswaSpkController extends Controller
     }
 
     /**
-     * Calculate score for a kriteria dynamically
+     * Get minat score using AHP weights and matching logic
+     * Score = Σ(Category Weight × Match Score)
      */
-    private function calculateKriteriaScore($kodeKriteria, $value, $prodi, $nilaiMapel = [])
+    private function getMinatScoreWithWeights($selectedMinatKode, $prodi, $minatCategories)
     {
-        switch ($kodeKriteria) {
-            case 'MINAT':
-                return $this->getMinatScore($value, $prodi);
-            case 'BAKAT':
-                return $this->getBakatScore($value, $prodi);
-            case 'NILAI':
-                return $this->getNilaiAkademikScore($nilaiMapel, $prodi);
-            case 'PROSPEK':
-                return $this->getProspekScore($value, $prodi);
-            default:
-                // For custom kriteria, return default score
-                return 75; // Neutral score
+        if (!$selectedMinatKode) {
+            return 0;
         }
-    }
 
-    /**
-     * Get minat score for prodi based on selected minat
-     */
-    private function getMinatScore($minat, $prodi)
-    {
-        // Mapping minat to prodi
-        $minatMapping = [
-            'proses_bisnis' => ['Sistem Informasi Bisnis', 'Manajemen Informatika'],
-            'pemrograman' => ['Teknik Informatika', 'Sistem Informasi', 'Rekayasa Perangkat Lunak'],
-            'seni_estetika' => ['Desain Grafis', 'Desain Komunikasi Visual', 'Multimedia'],
-            'fisika_matematika' => ['Teknik Elektro', 'Teknik Komputer', 'Teknik Fisika']
+        $score = 0;
+        $prodiName = strtolower($prodi->nama_prodi);
+
+        // Mapping minat kode ke nama prodi yang sesuai - lebih spesifik
+        $minatProdiMapping = [
+            'PROC_BIS' => [
+                'high' => ['sistem informasi'],
+                'medium' => ['bisnis', 'manajemen'],
+                'low' => []
+            ],
+            'PEMROG' => [
+                'high' => ['teknik informatika', 'teknologi informasi'],
+                'medium' => ['informatika', 'rekayasa perangkat lunak'],
+                'low' => ['sistem informasi']
+            ],
+            'SENI_EST' => [
+                'high' => ['desain komunikasi visual', 'desain grafis'],
+                'medium' => ['multimedia', 'seni'],
+                'low' => []
+            ],
+            'PFIS_MAT' => [
+                'high' => ['teknik telekomunikasi', 'teknik elektro'],
+                'medium' => ['fisika', 'teknik komputer'],
+                'low' => []
+            ]
         ];
 
-        // Check if prodi matches minat
-        foreach ($minatMapping as $key => $prodiList) {
-            if ($minat === $key) {
-                foreach ($prodiList as $prodiName) {
-                    if (stripos($prodi->nama_prodi, $prodiName) !== false) {
-                        return 100; // Perfect match
+        // Check if selected minat matches this prodi
+        $matchScore = 0;
+        if (isset($minatProdiMapping[$selectedMinatKode])) {
+            $mapping = $minatProdiMapping[$selectedMinatKode];
+            
+            // Check high priority matches
+            foreach ($mapping['high'] as $keyword) {
+                if (stripos($prodiName, $keyword) !== false) {
+                    $matchScore = 100;
+                    break;
+                }
+            }
+            
+            // Check medium priority matches
+            if ($matchScore === 0) {
+                foreach ($mapping['medium'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 70;
+                        break;
                     }
                 }
             }
-        }
-
-        return 50; // Partial match or no match
-    }
-
-    /**
-     * Get bakat score for prodi based on selected bakat
-     */
-    private function getBakatScore($bakat, $prodi)
-    {
-        // Mapping bakat to prodi
-        $bakatMapping = [
-            'problem_solving' => ['Sistem Informasi', 'Manajemen Informatika'],
-            'debugging' => ['Teknik Informatika', 'Rekayasa Perangkat Lunak'],
-            'elektronik' => ['Teknik Elektro', 'Teknik Komputer'],
-            'kepekaan_visual' => ['Desain Grafis', 'Desain Komunikasi Visual']
-        ];
-
-        foreach ($bakatMapping as $key => $prodiList) {
-            if ($bakat === $key) {
-                foreach ($prodiList as $prodiName) {
-                    if (stripos($prodi->nama_prodi, $prodiName) !== false) {
-                        return 100;
+            
+            // Check low priority matches (penalti)
+            if ($matchScore === 0) {
+                foreach ($mapping['low'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 30;
+                        break;
                     }
                 }
             }
+            
+            // No match at all
+            if ($matchScore === 0) {
+                $matchScore = 20;
+            }
         }
 
-        return 50;
+        // Use category weight from AHP
+        if (isset($minatCategories[$selectedMinatKode])) {
+            $categoryWeight = floatval($minatCategories[$selectedMinatKode]->bobot ?? 0);
+            $score = $matchScore * $categoryWeight; // matchScore already 0-100, weight is 0-1
+        } else {
+            $score = $matchScore;
+        }
+
+        return $score; // Already in correct range
+    }
+
+    /**
+     * Get bakat score using AHP weights and matching logic
+     */
+    private function getBakatScoreWithWeights($selectedBakatKode, $prodi, $bakatCategories)
+    {
+        if (!$selectedBakatKode) {
+            return 0;
+        }
+
+        $score = 0;
+        $prodiName = strtolower($prodi->nama_prodi);
+
+        // Mapping bakat kode ke nama prodi yang sesuai - lebih spesifik
+        $bakatProdiMapping = [
+            'PROB_BIS' => [
+                'high' => ['sistem informasi'],
+                'medium' => ['bisnis', 'manajemen'],
+                'low' => []
+            ],
+            'DEBUG' => [
+                'high' => ['teknik informatika', 'teknologi informasi'],
+                'medium' => ['informatika', 'rekayasa perangkat lunak'],
+                'low' => ['sistem informasi']
+            ],
+            'ELEC_SIG' => [
+                'high' => ['teknik telekomunikasi', 'teknik elektro'],
+                'medium' => ['fisika', 'teknik komputer'],
+                'low' => []
+            ],
+            'VISUAL' => [
+                'high' => ['desain komunikasi visual', 'desain grafis'],
+                'medium' => ['multimedia', 'seni'],
+                'low' => []
+            ]
+        ];
+
+        // Check if selected bakat matches this prodi
+        $matchScore = 0;
+        if (isset($bakatProdiMapping[$selectedBakatKode])) {
+            $mapping = $bakatProdiMapping[$selectedBakatKode];
+            
+            // Check high priority matches
+            foreach ($mapping['high'] as $keyword) {
+                if (stripos($prodiName, $keyword) !== false) {
+                    $matchScore = 100;
+                    break;
+                }
+            }
+            
+            // Check medium priority matches
+            if ($matchScore === 0) {
+                foreach ($mapping['medium'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 70;
+                        break;
+                    }
+                }
+            }
+            
+            // Check low priority matches (penalti)
+            if ($matchScore === 0) {
+                foreach ($mapping['low'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 30;
+                        break;
+                    }
+                }
+            }
+            
+            // No match at all
+            if ($matchScore === 0) {
+                $matchScore = 20;
+            }
+        }
+
+        // Use category weight from AHP
+        if (isset($bakatCategories[$selectedBakatKode])) {
+            $categoryWeight = floatval($bakatCategories[$selectedBakatKode]->bobot ?? 0);
+            $score = $matchScore * $categoryWeight; // matchScore already 0-100, weight is 0-1
+        } else {
+            $score = $matchScore;
+        }
+
+        return $score; // Already in correct range
+    }
+
+    /**
+     * Get prospek karir score using AHP weights
+     */
+    private function getProspekScoreWithWeights($selectedKarirKode, $prodi, $karirCategories)
+    {
+        if (!$selectedKarirKode) {
+            return 0;
+        }
+
+        $score = 0;
+        $prodiName = strtolower($prodi->nama_prodi);
+
+        // Mapping karir kode ke nama prodi yang sesuai - lebih spesifik
+        $karirProdiMapping = [
+            'SYSAN' => [
+                'high' => ['sistem informasi'],
+                'medium' => ['teknologi informasi'],
+                'low' => ['teknik informatika']
+            ],
+            'SWE' => [
+                'high' => ['teknik informatika', 'teknologi informasi'],
+                'medium' => ['informatika', 'rekayasa perangkat lunak'],
+                'low' => ['sistem informasi']
+            ],
+            'NETENG' => [
+                'high' => ['teknik telekomunikasi', 'teknik komputer'],
+                'medium' => ['jaringan', 'teknologi informasi'],
+                'low' => []
+            ],
+            'GDES' => [
+                'high' => ['desain komunikasi visual', 'desain grafis'],
+                'medium' => ['multimedia', 'seni'],
+                'low' => []
+            ]
+        ];
+
+        // Check if selected karir matches this prodi
+        $matchScore = 0;
+        if (isset($karirProdiMapping[$selectedKarirKode])) {
+            $mapping = $karirProdiMapping[$selectedKarirKode];
+            
+            // Check high priority matches
+            foreach ($mapping['high'] as $keyword) {
+                if (stripos($prodiName, $keyword) !== false) {
+                    $matchScore = 100;
+                    break;
+                }
+            }
+            
+            // Check medium priority matches
+            if ($matchScore === 0) {
+                foreach ($mapping['medium'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 70;
+                        break;
+                    }
+                }
+            }
+            
+            // Check low priority matches (penalti)
+            if ($matchScore === 0) {
+                foreach ($mapping['low'] as $keyword) {
+                    if (stripos($prodiName, $keyword) !== false) {
+                        $matchScore = 30;
+                        break;
+                    }
+                }
+            }
+            
+            // No match at all
+            if ($matchScore === 0) {
+                $matchScore = 20;
+            }
+        }
+
+        // Use category weight from AHP
+        if (isset($karirCategories[$selectedKarirKode])) {
+            $categoryWeight = floatval($karirCategories[$selectedKarirKode]->bobot ?? 0);
+            $score = $matchScore * $categoryWeight; // matchScore already 0-100, weight is 0-1
+        } else {
+            $score = $matchScore;
+        }
+
+        return $score; // Already in correct range
     }
 
     /**
      * Get nilai akademik score based on mata pelajaran inputs
-     * Using weighted average based on alternative weights
+     * Using simple average of all input nilai_mapel (0-100 scale)
      */
     private function getNilaiAkademikScore($nilaiMapel, $prodi)
     {
-        $alternatives = $prodi->alternatives;
-
-        if ($alternatives->isEmpty()) {
+        if (empty($nilaiMapel)) {
             return 0;
         }
 
-        $totalWeightedScore = 0;
-        $totalWeight = 0;
+        // Calculate simple average of all input nilai mapel
+        $totalNilai = 0;
+        $count = 0;
 
-        foreach ($alternatives as $alt) {
-            $mapelKey = $this->getMapelKey($alt->nama_alternatif);
-
-            if (isset($nilaiMapel[$mapelKey])) {
-                $nilai = floatval($nilaiMapel[$mapelKey]);
-                $weight = $alt->bobot ?? 1;
-
-                $totalWeightedScore += $nilai * $weight;
-                $totalWeight += $weight;
+        foreach ($nilaiMapel as $key => $nilai) {
+            if ($nilai !== null && $nilai !== '') {
+                $totalNilai += floatval($nilai);
+                $count++;
             }
         }
 
-        return $totalWeight > 0 ? $totalWeightedScore / $totalWeight : 0;
-    }
-
-    /**
-     * Get prospek karir score
-     */
-    private function getProspekScore($prospek, $prodi)
-    {
-        $prospekMapping = [
-            'system_analyst' => ['Sistem Informasi', 'Manajemen Informatika'],
-            'software_developer' => ['Teknik Informatika', 'Rekayasa Perangkat Lunak'],
-            'network_engineer' => ['Teknik Komputer', 'Jaringan Komputer'],
-            'graphic_designer' => ['Desain Grafis', 'Desain Komunikasi Visual']
-        ];
-
-        foreach ($prospekMapping as $key => $prodiList) {
-            if ($prospek === $key) {
-                foreach ($prodiList as $prodiName) {
-                    if (stripos($prodi->nama_prodi, $prodiName) !== false) {
-                        return 100;
-                    }
-                }
-            }
-        }
-
-        return 50;
+        return $count > 0 ? $totalNilai / $count : 0;
     }
 
     /**
@@ -406,9 +568,11 @@ class SiswaSpkController extends Controller
      */
     private function getCategory($score)
     {
-        if ($score >= 80) return 'Sangat Sesuai';
-        if ($score >= 70) return 'Sesuai';
-        if ($score >= 60) return 'Cukup Sesuai';
+        // Adjusted thresholds based on weighted score calculation
+        // Total score range: 0-100 (after applying kriteria weights)
+        if ($score >= 35) return 'Sangat Sesuai';
+        if ($score >= 28) return 'Sesuai';
+        if ($score >= 20) return 'Cukup Sesuai';
         return 'Kurang Sesuai';
     }
 }

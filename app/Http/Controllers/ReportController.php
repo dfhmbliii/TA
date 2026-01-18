@@ -34,6 +34,7 @@ class ReportController extends Controller
         $prodiId = $request->input('prodi_id');
         $includeEmpty = filter_var($request->input('includeEmpty', true), FILTER_VALIDATE_BOOLEAN);
 
+        // Data 1: Siswa yang sudah terdaftar di prodi
         $query = Siswa::query()
             ->selectRaw('YEAR(created_at) as year, prodi_id, COUNT(*) as total')
             ->whereNotNull('prodi_id')
@@ -52,9 +53,40 @@ class ReportController extends Controller
             $data[$r->year][$r->prodi_id] = (int)$r->total;
         }
 
+        // Get all prodis
         $prodis = Prodi::orderBy('nama_prodi')->get(['id','nama_prodi']);
+
+        // Data 2: Rekomendasi SPK (ambil top prodi dari rekomendasi_prodi)
+        $spkResults = \App\Models\SpkResult::whereBetween(DB::raw('YEAR(created_at)'), [$from, $to])->get();
+        
+        // Parse rekomendasi_prodi and count by prodi name
+        $spkData = [];
+        
+        foreach ($spkResults as $result) {
+            $year = $result->created_at->format('Y');
+            
+            // Get rekomendasi - bisa berupa array atau string
+            $rekomendasi = $result->rekomendasi_prodi;
+            if (is_string($rekomendasi)) {
+                $rekomendasi = json_decode($rekomendasi, true);
+            }
+            
+            if (is_array($rekomendasi) && !empty($rekomendasi)) {
+                // Get top recommendation (rank 1)
+                $topProdi = $rekomendasi[0]['nama_prodi'] ?? null;
+                if ($topProdi) {
+                    // Find prodi id by name
+                    $prodi = $prodis->firstWhere('nama_prodi', $topProdi);
+                    if ($prodi) {
+                        $spkData[$year][$prodi->id] = ($spkData[$year][$prodi->id] ?? 0) + 1;
+                    }
+                }
+            }
+        }
+
         $years = range($from, $to);
 
+        // Series 1: Siswa Terdaftar
         $series = [];
         foreach ($prodis as $p) {
             $points = [];
@@ -64,8 +96,25 @@ class ReportController extends Controller
             if ($includeEmpty || array_sum($points) > 0) {
                 $series[] = [
                     'prodi_id' => $p->id,
-                    'label' => $p->nama_prodi,
+                    'label' => $p->nama_prodi . ' (Terdaftar)',
                     'data' => $points,
+                    'type' => 'registered'
+                ];
+            }
+        }
+
+        // Series 2: Rekomendasi SPK
+        foreach ($prodis as $p) {
+            $points = [];
+            foreach ($years as $y) {
+                $points[] = $spkData[$y][$p->id] ?? 0;
+            }
+            if ($includeEmpty || array_sum($points) > 0) {
+                $series[] = [
+                    'prodi_id' => $p->id,
+                    'label' => $p->nama_prodi . ' (Rekomendasi SPK)',
+                    'data' => $points,
+                    'type' => 'recommendation'
                 ];
             }
         }
@@ -112,8 +161,25 @@ class ReportController extends Controller
 
     private function availableYears(): array
     {
-    $min = Siswa::query()->min(DB::raw('YEAR(created_at)')) ?? date('Y');
-    $max = Siswa::query()->max(DB::raw('YEAR(created_at)')) ?? date('Y');
+        // Collect min/max from both siswa creation and SPK results to widen the selectable range
+        $siswaMin = Siswa::query()->min(DB::raw('YEAR(created_at)'));
+        $siswaMax = Siswa::query()->max(DB::raw('YEAR(created_at)'));
+
+        $spkMin = \App\Models\SpkResult::query()->min(DB::raw('YEAR(created_at)'));
+        $spkMax = \App\Models\SpkResult::query()->max(DB::raw('YEAR(created_at)'));
+
+        $minCandidates = array_filter([$siswaMin, $spkMin], fn($v) => !is_null($v));
+        $maxCandidates = array_filter([$siswaMax, $spkMax], fn($v) => !is_null($v));
+
+        $min = $minCandidates ? min($minCandidates) : (int)date('Y');
+        $max = $maxCandidates ? max($maxCandidates) : (int)date('Y');
+
+        // If only a single year exists, widen the selectable range for UI usability
+        if ($min === $max) {
+            $max = max($max, (int)date('Y'));
+            $min = $max - 4; // show last 5 years window
+        }
+
         if ($min > $max) { $min = $max; }
         return range($min, $max);
     }

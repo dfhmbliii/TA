@@ -152,7 +152,6 @@
                                         data-result-id="<?php echo e($result->id); ?>" 
                                         data-total-score="<?php echo e($result->total_score); ?>" 
                                         data-category="<?php echo e($result->category); ?>" 
-                                        data-input="<?php echo e(json_encode($result->input_data)); ?>" 
                                         data-created="<?php echo e($result->created_at->format('d F Y, H:i:s')); ?>">
                                         <i class="fas fa-eye me-1"></i>
                                         Detail
@@ -221,7 +220,7 @@
                     </div>
 
                     <!-- Data Input Section -->
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm mb-4">
                         <div class="card-header bg-light">
                             <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Data Input Anda</h6>
                         </div>
@@ -251,6 +250,18 @@
                                         <span class="badge bg-info fs-6" id="modalInputNilai">-</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rekomendasi Prodi Section -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Rekomendasi Program Studi</h6>
+                        </div>
+                        <div class="card-body" id="modalRekomendasiProdi">
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Memuat rekomendasi...
                             </div>
                         </div>
                     </div>
@@ -326,9 +337,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             try {
+                const resultId = this.getAttribute('data-result-id');
                 const totalScore = this.getAttribute('data-total-score');
                 const category = this.getAttribute('data-category');
-                const inputData = JSON.parse(this.getAttribute('data-input') || '{}');
                 const created = this.getAttribute('data-created');
                 
                 // Update modal content
@@ -343,38 +354,108 @@ document.addEventListener('DOMContentLoaded', function() {
                 } fs-6 px-3 py-2">${category}</span>`;
                 document.getElementById('modalCategory').innerHTML = categoryBadge;
                 
-                // Populate input data
-                if (inputData && Object.keys(inputData).length > 0) {
-                    const minatText = inputData['minat'] ? 
-                        inputData['minat'].charAt(0).toUpperCase() + inputData['minat'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputMinat').textContent = minatText;
-                    
-                    const bakatText = inputData['bakat'] ? 
-                        inputData['bakat'].charAt(0).toUpperCase() + inputData['bakat'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputBakat').textContent = bakatText;
-                    
-                    const karirText = inputData['prospek_karir'] ? 
-                        inputData['prospek_karir'].charAt(0).toUpperCase() + inputData['prospek_karir'].slice(1).replace(/_/g, ' ') : '-';
-                    document.getElementById('modalInputKarir').textContent = karirText;
-                    
-                    // Calculate average nilai
-                    if (inputData['nilai_mapel']) {
-                        const nilaiMapel = inputData['nilai_mapel'];
-                        const values = Object.values(nilaiMapel).map(v => parseFloat(v) || 0);
-                        const avg = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : '-';
-                        document.getElementById('modalInputNilai').textContent = avg;
-                    } else {
-                        document.getElementById('modalInputNilai').textContent = '-';
-                    }
-                } else {
-                    document.getElementById('modalInputMinat').textContent = '-';
-                    document.getElementById('modalInputBakat').textContent = '-';
-                    document.getElementById('modalInputKarir').textContent = '-';
-                    document.getElementById('modalInputNilai').textContent = '-';
-                }
-                
-                // Show modal
+                // Show modal first
                 detailModal.show();
+                
+                // Fetch detail data (input + rekomendasi) from server
+                const rekomendasiContainer = document.getElementById('modalRekomendasiProdi');
+                rekomendasiContainer.innerHTML = `
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Memuat data...
+                    </div>
+                `;
+                
+                // Fetch detail analysis
+                fetch(`/spk/result/${resultId}/detail`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data && data.data.input_data) {
+                            const inputData = data.data.input_data;
+                            
+                            // Populate input data
+                            if (inputData && typeof inputData === 'object' && Object.keys(inputData).length > 0) {
+                                const minatText = inputData['minat'] ? 
+                                    inputData['minat'].charAt(0).toUpperCase() + inputData['minat'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputMinat').textContent = minatText;
+                                
+                                const bakatText = inputData['bakat'] ? 
+                                    inputData['bakat'].charAt(0).toUpperCase() + inputData['bakat'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputBakat').textContent = bakatText;
+                                
+                                const karirText = inputData['prospek_karir'] ? 
+                                    inputData['prospek_karir'].charAt(0).toUpperCase() + inputData['prospek_karir'].slice(1).replace(/_/g, ' ') : '-';
+                                document.getElementById('modalInputKarir').textContent = karirText;
+                                
+                                // Calculate average nilai
+                                if (inputData['nilai_mapel']) {
+                                    const nilaiMapel = inputData['nilai_mapel'];
+                                    const values = Object.values(nilaiMapel).map(v => parseFloat(v) || 0);
+                                    const avg = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2) : '-';
+                                    document.getElementById('modalInputNilai').textContent = avg;
+                                } else {
+                                    document.getElementById('modalInputNilai').textContent = '-';
+                                }
+                            } else {
+                                document.getElementById('modalInputMinat').textContent = '-';
+                                document.getElementById('modalInputBakat').textContent = '-';
+                                document.getElementById('modalInputKarir').textContent = '-';
+                                document.getElementById('modalInputNilai').textContent = '-';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching detail:', error);
+                    });
+                
+                // Fetch rekomendasi prodi
+                if (resultId) {
+                    fetch(`/spk/result/${resultId}/rekomendasi`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.rekomendasi && data.rekomendasi.length > 0) {
+                                let html = '<div class="list-group list-group-flush">';
+                                data.rekomendasi.forEach((prodi, index) => {
+                                    html += `
+                                        <div class="list-group-item px-0 py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="badge bg-primary rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                                                        ${index + 1}
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6 class="mb-1">${prodi.nama_prodi || prodi.name || 'N/A'}</h6>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-chart-line me-1"></i>
+                                                        Skor: <strong>${prodi.score ? parseFloat(prodi.score).toFixed(2) : 'N/A'}</strong>
+                                                        ${prodi.percentage ? `(${parseFloat(prodi.percentage).toFixed(1)}%)` : ''}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                                html += '</div>';
+                                rekomendasiContainer.innerHTML = html;
+                            } else {
+                                rekomendasiContainer.innerHTML = `
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                                        <p class="mb-0">Tidak ada rekomendasi program studi tersedia</p>
+                                    </div>
+                                `;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching rekomendasi:', error);
+                            rekomendasiContainer.innerHTML = `
+                                <div class="text-center text-danger py-4">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                    <p class="mb-0">Gagal memuat rekomendasi program studi</p>
+                                </div>
+                            `;
+                        });
+                }
             } catch (error) {
                 console.error('Error parsing data:', error);
                 alert('Terjadi kesalahan saat memuat detail.');

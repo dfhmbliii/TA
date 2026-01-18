@@ -76,11 +76,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <div class="text-center py-5">
-                    <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">Grafik akan ditampilkan di sini</h6>
-                    <p class="text-muted">Data visualisasi distribusi siswa berdasarkan program studi</p>
-                </div>
+                <canvas id="prodiChart" height="80"></canvas>
             </div>
         </div>
     </div>
@@ -175,4 +171,96 @@
     </div>
 </div>
 <?php $__env->stopSection(); ?>
+<?php $__env->startPush('scripts'); ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('prodiChart');
+    if (!ctx) return;
+    
+    // Fetch data from the report endpoint
+    fetch('/reports/prodi/data?from=2026&to=2026&includeEmpty=true')
+        .then(response => response.json())
+        .then(data => {
+            // Group data by prodi
+            const prodiData = {};
+            
+            data.series.forEach(item => {
+                // Extract prodi name (remove type suffix)
+                const prodiName = item.label.replace(' (Terdaftar)', '').replace(' (Rekomendasi SPK)', '');
+                
+                if (!prodiData[prodiName]) {
+                    prodiData[prodiName] = {
+                        registered: 0,
+                        recommended: 0
+                    };
+                }
+                
+                // Sum all values in the data array
+                const total = item.data.reduce((a, b) => a + b, 0);
+                
+                if (item.type === 'registered') {
+                    prodiData[prodiName].registered = total;
+                } else if (item.type === 'recommendation') {
+                    prodiData[prodiName].recommended = total;
+                }
+            });
+            
+            // Prepare chart data
+            const labels = Object.keys(prodiData);
+            const registeredData = labels.map(label => prodiData[label].registered);
+            const recommendedData = labels.map(label => prodiData[label].recommended);
+            
+            // Create chart
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Siswa Terdaftar',
+                            data: registeredData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Rekomendasi SPK',
+                            data: recommendedData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+            ctx.parentElement.innerHTML = '<div class="alert alert-danger">Gagal memuat data grafik</div>';
+        });
+});
+</script>
+<?php $__env->stopPush(); ?>
+
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\tugas_akhir\resources\views/dashboard.blade.php ENDPATH**/ ?>
