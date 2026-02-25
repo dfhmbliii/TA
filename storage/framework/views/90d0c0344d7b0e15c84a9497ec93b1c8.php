@@ -714,6 +714,7 @@
         .card:nth-child(3) { animation-delay: 0.3s; }
         .card:nth-child(4) { animation-delay: 0.4s; }
     </style>
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
@@ -773,6 +774,12 @@
                                 <a href="<?php echo e(route('prodi.index')); ?>" class="nav-link <?php echo e(request()->routeIs('prodi.*') ? 'active' : ''); ?>">
                                     <i class="fas fa-graduation-cap"></i>
                                     <span>Program Studi</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('reports.prodi')); ?>" class="nav-link <?php echo e(request()->routeIs('reports.prodi') ? 'active' : ''); ?>">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span>Reports Prodi</span>
                                 </a>
                             </li>
                             <?php endif; ?>

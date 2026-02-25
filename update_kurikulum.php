@@ -9,64 +9,75 @@ $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 use App\Models\Prodi;
 
-// Sample kurikulum data untuk Sistem Informasi
+// Kurikulum lengkap untuk Sistem Informasi berdasarkan data terbaru
 $kurikulumSI = [
-    // Semester 1
-    ['semester' => 1, 'kode' => 'UNW00101', 'nama' => 'Pendidikan Pancasila', 'sks' => 2, 'kategori' => 'mkwu', 'prasyarat' => ''],
-    ['semester' => 1, 'kode' => 'UNW00102', 'nama' => 'Pendidikan Agama', 'sks' => 2, 'kategori' => 'mkwu', 'prasyarat' => ''],
-    ['semester' => 1, 'kode' => 'SIF00101', 'nama' => 'Algoritma dan Pemrograman', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 1, 'kode' => 'SIF00102', 'nama' => 'Matematika Diskrit', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 1, 'kode' => 'SIF00103', 'nama' => 'Pengantar Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 1, 'kode' => 'SIF00104', 'nama' => 'Pengantar Teknologi Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    // Semester 1 - Total 19 SKS
+    ['semester' => 1, 'kode' => 'SI101', 'nama' => 'Agama', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI102', 'nama' => 'Internalisasi Budaya dan Pembentukan Karakter', 'sks' => 1, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI103', 'nama' => 'Algoritma dan Pemrograman', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI104', 'nama' => 'Matematika Diskrit', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI105', 'nama' => 'Matematika untuk Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI106', 'nama' => 'Pengantar Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 1, 'kode' => 'SI107', 'nama' => 'Sistem Enterprise', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
     
-    // Semester 2
-    ['semester' => 2, 'kode' => 'UNW00201', 'nama' => 'Bahasa Indonesia', 'sks' => 2, 'kategori' => 'mkwu', 'prasyarat' => ''],
-    ['semester' => 2, 'kode' => 'UNW00202', 'nama' => 'Bahasa Inggris', 'sks' => 2, 'kategori' => 'mkwu', 'prasyarat' => ''],
-    ['semester' => 2, 'kode' => 'SIF00201', 'nama' => 'Struktur Data', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00101'],
-    ['semester' => 2, 'kode' => 'SIF00202', 'nama' => 'Basis Data', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 2, 'kode' => 'SIF00203', 'nama' => 'Sistem Digital', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 2, 'kode' => 'SIF00204', 'nama' => 'Statistika', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    // Semester 2 - Total 18 SKS
+    ['semester' => 2, 'kode' => 'SI201', 'nama' => 'Design Thinking', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 2, 'kode' => 'SI202', 'nama' => 'Jaringan Komputer', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 2, 'kode' => 'SI203', 'nama' => 'Kepemimpinan dan Komunikasi Interpersonal', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 2, 'kode' => 'SI204', 'nama' => 'Manjemen Rantai Pasok', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 2, 'kode' => 'SI205', 'nama' => 'Pemrograman Berorientasi Objek', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI103'],
+    ['semester' => 2, 'kode' => 'SI206', 'nama' => 'Probabilitas dan Statistik', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 2, 'kode' => 'SI207', 'nama' => 'Sistem Basis Data', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
     
-    // Semester 3
-    ['semester' => 3, 'kode' => 'UNW00301', 'nama' => 'Kewarganegaraan', 'sks' => 2, 'kategori' => 'mkwu', 'prasyarat' => ''],
-    ['semester' => 3, 'kode' => 'SIF00301', 'nama' => 'Pemrograman Berorientasi Objek', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00201'],
-    ['semester' => 3, 'kode' => 'SIF00302', 'nama' => 'Analisis dan Perancangan Sistem', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00202'],
-    ['semester' => 3, 'kode' => 'SIF00303', 'nama' => 'Jaringan Komputer', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 3, 'kode' => 'SIF00304', 'nama' => 'Sistem Operasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 3, 'kode' => 'SIF00305', 'nama' => 'Manajemen Proyek SI', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    // Semester 3 - Total 20 SKS
+    ['semester' => 3, 'kode' => 'SI301', 'nama' => 'Analisis dan Perancangan Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI106'],
+    ['semester' => 3, 'kode' => 'SI302', 'nama' => 'Etika Profesi, Regulasi IT dan Properti Intelektual', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 3, 'kode' => 'SI303', 'nama' => 'Permodelan Bisnis', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 3, 'kode' => 'SI304', 'nama' => 'Pengembangan Aplikasi Website', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI205'],
+    ['semester' => 3, 'kode' => 'SI305', 'nama' => 'Perancangan Interaksi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 3, 'kode' => 'SI306', 'nama' => 'Sistem Operasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 3, 'kode' => 'SI307', 'nama' => 'Statistika Industri', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI206'],
     
-    // Semester 4
-    ['semester' => 4, 'kode' => 'SIF00401', 'nama' => 'Rekayasa Perangkat Lunak', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00302'],
-    ['semester' => 4, 'kode' => 'SIF00402', 'nama' => 'Pemrograman Web', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00301'],
-    ['semester' => 4, 'kode' => 'SIF00403', 'nama' => 'Interaksi Manusia dan Komputer', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 4, 'kode' => 'SIF00404', 'nama' => 'Kecerdasan Buatan', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 4, 'kode' => 'SIF00405', 'nama' => 'E-Business', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    // Semester 4 - Total 19 SKS
+    ['semester' => 4, 'kode' => 'SI401', 'nama' => 'Integrasi Aplikasi Enterprise', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI107'],
+    ['semester' => 4, 'kode' => 'SI402', 'nama' => 'Keamanan Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 4, 'kode' => 'SI403', 'nama' => 'Manjemen Proyek Sistem', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI301'],
+    ['semester' => 4, 'kode' => 'SI404', 'nama' => 'Manjemen Proyek Sumber Daya Manusia', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 4, 'kode' => 'SI405', 'nama' => 'Data Mining', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI207'],
+    ['semester' => 4, 'kode' => 'SI406', 'nama' => 'Pengujian dan Implementasi Sistem', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => 'SI301'],
+    ['semester' => 4, 'kode' => 'SI407', 'nama' => 'Rekayasa Proses Bisnis', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => 'SI303'],
     
-    // Semester 5
-    ['semester' => 5, 'kode' => 'SIF00501', 'nama' => 'Keamanan Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 5, 'kode' => 'SIF00502', 'nama' => 'Data Mining', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SIF00202'],
-    ['semester' => 5, 'kode' => 'SIF00503', 'nama' => 'Sistem Enterprise', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 5, 'kode' => 'SIF00504', 'nama' => 'Tata Kelola TI', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 5, 'kode' => 'SIF00505', 'nama' => 'Mobile Programming', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
-    ['semester' => 5, 'kode' => 'SIF00506', 'nama' => 'Big Data', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    // Semester 5 - Total 20 SKS
+    ['semester' => 5, 'kode' => 'SI501', 'nama' => 'Bahasa Inggris I', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 5, 'kode' => 'SI502', 'nama' => 'Arsitektur Enterprise', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI401'],
+    ['semester' => 5, 'kode' => 'SI503', 'nama' => 'Data Warehouse dan Business Intelligence', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI405'],
+    ['semester' => 5, 'kode' => 'SI504', 'nama' => 'KOmputasi Awan', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 5, 'kode' => 'SI505', 'nama' => 'Manajemen Data Enterprise', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI207'],
+    ['semester' => 5, 'kode' => 'SI506', 'nama' => 'Proyek Perangkat Lunak', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI304'],
+    ['semester' => 5, 'kode' => 'SI507', 'nama' => 'Sistem Informasi Akuntansi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
     
-    // Semester 6
-    ['semester' => 6, 'kode' => 'SIF00601', 'nama' => 'Audit Sistem Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 6, 'kode' => 'SIF00602', 'nama' => 'Business Intelligence', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SIF00502'],
-    ['semester' => 6, 'kode' => 'SIF00603', 'nama' => 'Metodologi Penelitian', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 6, 'kode' => 'SIF00604', 'nama' => 'Kerja Praktek', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 6, 'kode' => 'SIF00605', 'nama' => 'Cloud Computing', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
-    ['semester' => 6, 'kode' => 'SIF00606', 'nama' => 'IoT', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    // Semester 6 - Total 19 SKS
+    ['semester' => 6, 'kode' => 'SI601', 'nama' => 'Bahasa Indonesia', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 6, 'kode' => 'SI602', 'nama' => 'Bahasa Inggris II', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI501'],
+    ['semester' => 6, 'kode' => 'SI603', 'nama' => 'Kecerdasan Artifisial dan Penerapannya', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 6, 'kode' => 'SI604', 'nama' => 'Kerja Praktek dan Pengabdian Masyarakat', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 6, 'kode' => 'SI605', 'nama' => 'Tata Kelola Manajemen Teknologi Informasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => 'SI502'],
+    ['semester' => 6, 'kode' => 'SI606', 'nama' => 'MK Pilihan Prodi I / MK MBKM / MK WRAP', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    ['semester' => 6, 'kode' => 'SI607', 'nama' => 'MK Pilihan Prodi II / MK MBKM / MK WRAP', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
     
-    // Semester 7
-    ['semester' => 7, 'kode' => 'SIF00701', 'nama' => 'Kewirausahaan', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 7, 'kode' => 'SIF00702', 'nama' => 'Etika Profesi', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
-    ['semester' => 7, 'kode' => 'SIF00703', 'nama' => 'Skripsi 1', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00603'],
-    ['semester' => 7, 'kode' => 'SIF00704', 'nama' => 'Machine Learning', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
-    ['semester' => 7, 'kode' => 'SIF00705', 'nama' => 'Blockchain', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    // Semester 7 - Total 17 SKS
+    ['semester' => 7, 'kode' => 'SI701', 'nama' => 'Kewirausahaan', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 7, 'kode' => 'SI702', 'nama' => 'Capstone Project', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SI506'],
+    ['semester' => 7, 'kode' => 'SI703', 'nama' => 'Metode Penelitian dan Penyusunan Karya Ilmiah', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 7, 'kode' => 'SI704', 'nama' => 'MK Pilihan Prodi III / MK MBKM / MK WRAP', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    ['semester' => 7, 'kode' => 'SI705', 'nama' => 'MK Pilihan Prodi IV / MK MBKM / MK WRAP', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
+    ['semester' => 7, 'kode' => 'SI706', 'nama' => 'MK Pilihan Prodi V / MK MBKM / MK WRAP', 'sks' => 3, 'kategori' => 'pilihan', 'prasyarat' => ''],
     
-    // Semester 8
-    ['semester' => 8, 'kode' => 'SIF00801', 'nama' => 'Skripsi 2', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SIF00703'],
+    // Semester 8 - Total 11 SKS
+    ['semester' => 8, 'kode' => 'SI801', 'nama' => 'Kewarganegaraan', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 8, 'kode' => 'SI802', 'nama' => 'Pancasila', 'sks' => 2, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 8, 'kode' => 'SI803', 'nama' => 'Pelatihan dan Sertifikasi', 'sks' => 3, 'kategori' => 'wajib', 'prasyarat' => ''],
+    ['semester' => 8, 'kode' => 'SI804', 'nama' => 'Tugas Akhir', 'sks' => 4, 'kategori' => 'wajib', 'prasyarat' => 'SI702'],
 ];
 
 // Cari prodi Sistem Informasi

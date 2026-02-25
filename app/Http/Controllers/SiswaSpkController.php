@@ -255,7 +255,8 @@ class SiswaSpkController extends Controller
             ]);
         }
 
-        return view('spk.siswa-result', compact('prodiScores', 'kriteria', 'data'));
+        return view('spk.siswa-result', compact('prodiScores', 'kriteria', 'data', 'minatCategories', 'bakatCategories', 'karirCategories'));
+
     }
 
     /**

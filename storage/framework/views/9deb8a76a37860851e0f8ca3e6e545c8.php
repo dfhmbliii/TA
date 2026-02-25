@@ -1,4 +1,7 @@
-<?php $__env->startSection('title','Lupa Password'); ?>
+<?php $__env->startSection('title','Lupa Password - Pilihanku'); ?>
+<?php $__env->startSection('head'); ?>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/Pilihanku3.png')); ?>">
+<?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
 <div class="mb-4 text-center">
     <h1 class="h4 fw-bold">Lupa Password</h1>

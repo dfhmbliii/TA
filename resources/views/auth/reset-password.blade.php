@@ -30,3 +30,8 @@
     <a href="{{ route('login') }}" class="text-decoration-none">Kembali ke Login</a>
 </div>
 @endsection
+
+@section('head')
+    @parent
+    <link rel="icon" type="image/png" href="{{ asset('images/Pilihanku3.png') }}">
+@endsection

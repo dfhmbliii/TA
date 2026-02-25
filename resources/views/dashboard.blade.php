@@ -9,7 +9,7 @@
 </div>
 
 <div class="row g-4 mb-4">
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="stats-card primary">
             <div class="d-flex align-items-center">
                 <div class="stats-icon primary me-3">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="stats-card success">
             <div class="d-flex align-items-center">
                 <div class="stats-icon success me-3">
@@ -37,28 +37,14 @@
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="stats-card info">
-            <div class="d-flex align-items-center">
-                <div class="stats-icon info me-3">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <div>
-                    <div class="stats-number">{{ App\Models\Siswa::count() }}</div>
-                    <div class="stats-label">Total Siswa</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6">
+    <div class="col-xl-4 col-md-6">
         <div class="stats-card warning">
             <div class="d-flex align-items-center">
                 <div class="stats-icon warning me-3">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div>
-                    <div class="stats-number">0</div>
+                    <div class="stats-number">{{ App\Models\SpkResult::count() }}</div>
                     <div class="stats-label">Analisis SPK</div>
                 </div>
             </div>

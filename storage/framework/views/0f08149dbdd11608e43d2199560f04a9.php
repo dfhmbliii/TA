@@ -58,4 +58,9 @@ unset($__errorArgs, $__bag); ?>
 </div>
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('head'); ?>
+    <?php echo \Illuminate\View\Factory::parentPlaceholder('head'); ?>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/Pilihanku3.png')); ?>">
+<?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.auth', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\tugas_akhir\resources\views/auth/reset-password.blade.php ENDPATH**/ ?>

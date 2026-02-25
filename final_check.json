@@ -1,0 +1,207 @@
+﻿{
+    "kriteria": {
+        "title": "Perbandingan Kriteria",
+        "items": [
+            "Minat",
+            "Bakat",
+            "Nilai Akademik",
+            "Prospek Karir"
+        ],
+        "matrix": {
+            "Minat": {
+                "Minat": 1,
+                "Bakat": 0.748,
+                "Nilai Akademik": 0.416,
+                "Prospek Karir": 0.377
+            },
+            "Bakat": {
+                "Minat": 1.336898,
+                "Bakat": 1,
+                "Nilai Akademik": 0.57,
+                "Prospek Karir": 0.653
+            },
+            "Nilai Akademik": {
+                "Minat": 2.403846,
+                "Bakat": 1.754386,
+                "Nilai Akademik": 1,
+                "Prospek Karir": 1.674
+            },
+            "Prospek Karir": {
+                "Minat": 2.65252,
+                "Bakat": 1.531394,
+                "Nilai Akademik": 0.597372,
+                "Prospek Karir": 1
+            }
+        },
+        "column_sums": {
+            "Minat": 7.393263999999999,
+            "Bakat": 5.03378,
+            "Nilai Akademik": 2.583372,
+            "Prospek Karir": 3.7039999999999997
+        }
+    },
+    "minat": {
+        "title": "Perbandingan Minat",
+        "items": [
+            "Proses Bisnis",
+            "Pemrograman",
+            "Penerapan Fisika dan Matematika",
+            "Seni dan Estetika Visual"
+        ],
+        "matrix": {
+            "Proses Bisnis": {
+                "Proses Bisnis": 1,
+                "Pemrograman": 1.539,
+                "Penerapan Fisika dan Matematika": 1.158,
+                "Seni dan Estetika Visual": 1.033
+            },
+            "Pemrograman": {
+                "Proses Bisnis": 0.649773,
+                "Pemrograman": 1,
+                "Penerapan Fisika dan Matematika": 1.039,
+                "Seni dan Estetika Visual": 1.138
+            },
+            "Penerapan Fisika dan Matematika": {
+                "Proses Bisnis": 0.863558,
+                "Pemrograman": 0.962464,
+                "Penerapan Fisika dan Matematika": 1,
+                "Seni dan Estetika Visual": 1.098
+            },
+            "Seni dan Estetika Visual": {
+                "Proses Bisnis": 0.968054,
+                "Pemrograman": 0.878735,
+                "Penerapan Fisika dan Matematika": 0.910747,
+                "Seni dan Estetika Visual": 1
+            }
+        },
+        "column_sums": {
+            "Proses Bisnis": 3.481385,
+            "Pemrograman": 4.380198999999999,
+            "Penerapan Fisika dan Matematika": 4.107747,
+            "Seni dan Estetika Visual": 4.269
+        }
+    },
+    "bakat": {
+        "title": "Perbandingan Bakat",
+        "items": [
+            "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis",
+            "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)",
+            "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal",
+            "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi"
+        ],
+        "matrix": {
+            "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": {
+                "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": 1,
+                "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": 0.839,
+                "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": 1.112,
+                "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": 1.174
+            },
+            "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": {
+                "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": 1.191895,
+                "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": 1,
+                "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": 0.966,
+                "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": 0.628
+            },
+            "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": {
+                "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": 0.899281,
+                "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": 1.035197,
+                "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": 1,
+                "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": 0.69
+            },
+            "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": {
+                "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": 0.851789,
+                "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": 1.592357,
+                "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": 1.449275,
+                "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": 1
+            }
+        },
+        "column_sums": {
+            "Kemampuan memecahkan masalah (problem-solving) dari sudut pandang bisnis": 3.942965,
+            "Memiliki ketekunan dan ketelitian tinggi dalam mencari kesalahan teknis (debugging)": 4.4665539999999995,
+            "Kemampuan menganalisis rangkaian elektronik dan pemrosesan sinyal": 4.527275,
+            "Kepekaan visual (rasa estetika) yang baik terhadap komposisi, warna, dan tipografi": 3.492
+        }
+    },
+    "akademik": {
+        "title": "Perbandingan Akademik",
+        "items": [
+            "Bahasa Inggris",
+            "Informatika",
+            "Matematika",
+            "Seni Budaya"
+        ],
+        "matrix": {
+            "Bahasa Inggris": {
+                "Bahasa Inggris": 1,
+                "Informatika": 0.484,
+                "Matematika": 0.325,
+                "Seni Budaya": 0.317
+            },
+            "Informatika": {
+                "Bahasa Inggris": 2.066116,
+                "Informatika": 1,
+                "Matematika": 0.388,
+                "Seni Budaya": 0.539
+            },
+            "Matematika": {
+                "Bahasa Inggris": 3.076923,
+                "Informatika": 2.57732,
+                "Matematika": 1,
+                "Seni Budaya": 0.864
+            },
+            "Seni Budaya": {
+                "Bahasa Inggris": 3.154574,
+                "Informatika": 1.855288,
+                "Matematika": 1.157407,
+                "Seni Budaya": 1
+            }
+        },
+        "column_sums": {
+            "Bahasa Inggris": 9.297613,
+            "Informatika": 5.916608,
+            "Matematika": 2.870407,
+            "Seni Budaya": 2.72
+        }
+    },
+    "karir": {
+        "title": "Perbandingan Karir",
+        "items": [
+            "System Analyst",
+            "Software Developer \/ Engineer",
+            "Network Engineer",
+            "Graphic Designer"
+        ],
+        "matrix": {
+            "System Analyst": {
+                "System Analyst": 1,
+                "Software Developer \/ Engineer": 1.201,
+                "Network Engineer": 1.04,
+                "Graphic Designer": 1.148
+            },
+            "Software Developer \/ Engineer": {
+                "System Analyst": 0.832639,
+                "Software Developer \/ Engineer": 1,
+                "Network Engineer": 1.001,
+                "Graphic Designer": 1.204
+            },
+            "Network Engineer": {
+                "System Analyst": 0.961538,
+                "Software Developer \/ Engineer": 0.999001,
+                "Network Engineer": 1,
+                "Graphic Designer": 1.437
+            },
+            "Graphic Designer": {
+                "System Analyst": 0.87108,
+                "Software Developer \/ Engineer": 0.830565,
+                "Network Engineer": 0.695894,
+                "Graphic Designer": 1
+            }
+        },
+        "column_sums": {
+            "System Analyst": 3.665257,
+            "Software Developer \/ Engineer": 4.030566,
+            "Network Engineer": 3.736894,
+            "Graphic Designer": 4.789
+        }
+    }
+}

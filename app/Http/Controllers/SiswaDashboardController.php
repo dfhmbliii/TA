@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Siswa;
 use App\Models\SpkResult;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MinatCategory;
+use App\Models\BakatCategory;
+use App\Models\KarirCategory;
 
 class SiswaDashboardController extends Controller
 {
@@ -28,7 +31,12 @@ class SiswaDashboardController extends Controller
                 ->get();
         }
 
-        return view('siswa.dashboard', compact('siswa', 'spkResults'));
+        // Get categories for lookup
+        $minatCategories = MinatCategory::all()->keyBy('kode');
+        $bakatCategories = BakatCategory::all()->keyBy('kode');
+        $karirCategories = KarirCategory::all()->keyBy('kode');
+
+        return view('siswa.dashboard', compact('siswa', 'spkResults', 'minatCategories', 'bakatCategories', 'karirCategories'));
     }
     
     public function history()
@@ -43,12 +51,24 @@ class SiswaDashboardController extends Controller
         // Get all SPK results history
         $spkResults = collect([]);
         if ($siswa) {
-            $spkResults = SpkResult::where('siswa_id', $siswa->id)
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+            $query = SpkResult::where('siswa_id', $siswa->id)
+                ->orderBy('created_at', 'desc');
+            
+            $perPage = request('per_page', 10);
+            
+            if ($perPage === 'all') {
+                $spkResults = $query->paginate($query->count());
+            } else {
+                $spkResults = $query->paginate(in_array($perPage, [10, 25, 50]) ? $perPage : 10);
+            }
         }
 
-        return view('siswa.history', compact('siswa', 'spkResults'));
+        // Get categories for lookup
+        $minatCategories = MinatCategory::all()->keyBy('kode');
+        $bakatCategories = BakatCategory::all()->keyBy('kode');
+        $karirCategories = KarirCategory::all()->keyBy('kode');
+
+        return view('siswa.history', compact('siswa', 'spkResults', 'minatCategories', 'bakatCategories', 'karirCategories'));
     }
     
     public function exportPdf($id)
@@ -142,6 +162,28 @@ class SiswaDashboardController extends Controller
         $inputData = $result->input_data;
         if (is_string($inputData)) {
             $inputData = json_decode($inputData, true);
+        }
+
+        // Resolve codes to names
+        if ($inputData && is_array($inputData)) {
+            if (isset($inputData['minat'])) {
+                $minat = MinatCategory::where('kode', $inputData['minat'])->first();
+                if ($minat) $inputData['minat'] = $minat->nama;
+            }
+            if (isset($inputData['bakat'])) {
+                $bakat = BakatCategory::where('kode', $inputData['bakat'])->first();
+                if ($bakat) $inputData['bakat'] = $bakat->nama;
+            }
+            // Fix key mismatch: handle both 'karir' and 'prospek_karir'
+            $karirCode = $inputData['prospek_karir'] ?? $inputData['karir'] ?? null;
+            if ($karirCode) {
+                $karir = KarirCategory::where('kode', $karirCode)->first();
+                if ($karir) {
+                    $inputData['prospek_karir'] = $karir->nama;
+                    // Ensure consistency
+                    $inputData['karir'] = $karir->nama; 
+                }
+            }
         }
         
         return response()->json([

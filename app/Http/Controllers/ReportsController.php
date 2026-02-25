@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Siswa;
 use App\Models\SpkResult;
+use App\Models\MinatCategory;
+use App\Models\BakatCategory;
+use App\Models\KarirCategory;
 use Illuminate\Http\Request;
 
 class ReportsController extends Controller
@@ -43,13 +46,17 @@ class ReportsController extends Controller
             if (is_string($prodiRec)) {
                 $prodiRec = json_decode($prodiRec, true);
             }
-            $prodiName = is_array($prodiRec) ? ($prodiRec['nama_prodi'] ?? '-') : $prodiRec;
+            // Check if it's an array and has at least one item (the top recommendation)
+            $prodiName = '-';
+            if (is_array($prodiRec) && count($prodiRec) > 0) {
+                $prodiName = $prodiRec[0]['nama_prodi'] ?? '-';
+            }
             
             return [
                 'id' => $item->id,
                 'siswa_name' => $item->siswa->name,
                 'nisn' => $item->siswa->nisn,
-                'total_score' => number_format($item->total_score, 4),
+                'total_score' => number_format($item->total_score, 2),
                 'category' => $item->category,
                 'rekomendasi_prodi' => $prodiName,
                 'created_at' => $item->created_at->format('d F Y, H:i'),
@@ -82,14 +89,38 @@ class ReportsController extends Controller
             $inputData = json_decode($inputData, true);
         }
 
+        // Resolve category names
+        if ($inputData) {
+            if (isset($inputData['minat'])) {
+                $cat = MinatCategory::where('kode', $inputData['minat'])->first();
+                $inputData['minat_text'] = $cat ? $cat->nama : ucwords(str_replace('_', ' ', $inputData['minat']));
+            }
+            if (isset($inputData['bakat'])) {
+                $cat = BakatCategory::where('kode', $inputData['bakat'])->first();
+                $inputData['bakat_text'] = $cat ? $cat->nama : ucwords(str_replace('_', ' ', $inputData['bakat']));
+            }
+            if (isset($inputData['prospek_karir'])) {
+                $cat = KarirCategory::where('kode', $inputData['prospek_karir'])->first();
+                $inputData['karir_text'] = $cat ? $cat->nama : ucwords(str_replace('_', ' ', $inputData['prospek_karir']));
+            }
+        }
+
+        // Format criteria values to 2 decimals
+        $formattedCriteria = [];
+        if (is_array($criteriaValues)) {
+            foreach ($criteriaValues as $key => $val) {
+                $formattedCriteria[$key] = number_format((float)$val, 2);
+            }
+        }
+
         return response()->json([
             'id' => $result->id,
             'siswa_name' => $result->siswa->name,
             'nisn' => $result->siswa->nisn,
-            'total_score' => number_format($result->total_score, 4),
+            'total_score' => number_format($result->total_score, 2),
             'category' => $result->category,
             'rekomendasi_prodi' => $result->rekomendasi_prodi,
-            'criteria_values' => $criteriaValues,
+            'criteria_values' => $formattedCriteria,
             'weights' => $weights,
             'input_data' => $inputData,
             'created_at' => $result->created_at->format('d F Y, H:i:s'),

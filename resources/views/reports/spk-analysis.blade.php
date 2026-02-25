@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 d-print-none">
         <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Laporan Analisis SPK</h4>
         <div>
             <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
@@ -250,12 +250,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modalDate').textContent = item.created_at;
             
             // Set input data
-            document.getElementById('modalInputMinat').textContent = (inputData?.minat) ? 
-                inputData.minat.charAt(0).toUpperCase() + inputData.minat.slice(1).replace(/_/g, ' ') : '-';
-            document.getElementById('modalInputBakat').textContent = (inputData?.bakat) ? 
-                inputData.bakat.charAt(0).toUpperCase() + inputData.bakat.slice(1).replace(/_/g, ' ') : '-';
-            document.getElementById('modalInputKarir').textContent = (inputData?.prospek_karir) ? 
-                inputData.prospek_karir.charAt(0).toUpperCase() + inputData.prospek_karir.slice(1).replace(/_/g, ' ') : '-';
+            document.getElementById('modalInputMinat').textContent = inputData?.minat_text || '-';
+            document.getElementById('modalInputBakat').textContent = inputData?.bakat_text || '-';
+            document.getElementById('modalInputKarir').textContent = inputData?.karir_text || '-';
             document.getElementById('modalInputNilai').textContent = avgNilai;
             
             document.getElementById('modalScore').textContent = item.total_score;
@@ -313,12 +310,115 @@ document.addEventListener('DOMContentLoaded', function() {
 @push('styles')
 <style>
     @media print {
-        .btn, .card-body form, .modal {
+        @page {
+            size: landscape;
+            margin: 1cm;
+        }
+
+        body {
+            background-color: white !important;
+            font-size: 11pt;
+            color: black !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Hide unnecessary elements */
+        .sidebar, 
+        .header, 
+        .navbar, 
+        .btn, 
+        .card-header, 
+        form, 
+        .modal, 
+        #filterForm, 
+        .d-print-none,
+        .content-header {
             display: none !important;
         }
+
+        /* Adjust content width */
+        .main-content, .content, .container-fluid {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        /* Card styling reset for print */
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+            background: none !important;
+        }
+
+        .card-body {
+            padding: 0 !important;
+        }
+
+        /* Table styling */
         .table {
-            font-size: 12px;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 10pt;
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #000 !important;
+            padding: 8px !important;
+            color: black !important;
+        }
+
+        .table thead th {
+            background-color: #f0f0f0 !important;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Badges to text */
+        .badge {
+            border: 1px solid #000;
+            color: black !important;
+            background: none !important;
+            font-weight: normal;
+            padding: 2px 6px;
+        }
+
+        /* Show print header */
+        .d-print-block {
+            display: block !important;
+        }
+
+        /* Hide Detail column in print */
+        .table th:last-child, 
+        .table td:last-child {
+            display: none;
         }
     }
 </style>
 @endpush
+
+<!-- Print Header (Hidden on Screen) -->
+<div class="d-none d-print-block mb-4">
+    <div class="row align-items-center border-bottom pb-3 mb-3" style="border-bottom: 3px double black !important;">
+        <div class="col-2 text-center">
+            <!-- Use absolute path or base64 for best print result, but asset usually works in browser print -->
+            <img src="{{ asset('images/Pilihanku3.png') }}" alt="Logo" style="width: 80px; height: auto;">
+        </div>
+        <div class="col-8 text-center">
+            <h3 class="mb-0 fw-bold text-uppercase" style="font-size: 18pt; letter-spacing: 1px;">Sistem Pendukung Keputusan (SPK)</h3>
+            <h4 class="mb-1 fw-bold" style="font-size: 16pt;">PEMILIHAN PROGRAM STUDI</h4>
+            <div class="small">
+                Alamat: Jl. Jend. Sudirman No. 123, Jakarta Pusat<br>
+                Telp: (021) 1234567 | Email: info@pilihanku.sch.id
+            </div>
+        </div>
+        <div class="col-2"></div>
+    </div>
+    
+    <div class="text-center mb-4">
+        <h5 class="fw-bold text-decoration-underline">LAPORAN HASIL ANALISIS SPK</h5>
+        <p class="mb-0">Periode: {{ request('from_date') ? \Carbon\Carbon::parse(request('from_date'))->format('F Y') : 'Semua' }} s/d {{ request('to_date') ? \Carbon\Carbon::parse(request('to_date'))->format('F Y') : 'Sekarang' }}</p>
+    </div>
+</div>

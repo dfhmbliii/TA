@@ -66,7 +66,7 @@ function getFakultasColor($fakultas) {
                                 <?php
                                     $color = getFakultasColor($prodi->nama_fakultas);
                                 ?>
-                                <div class="avatar-sm text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="background-color: <?php echo e($color); ?>;">
+                                <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="background-color: <?php echo e($color); ?>; width: 40px; height: 40px; min-width: 40px; font-weight: 600; font-size: 18px;">
                                     <?php echo e(substr($prodi->nama_prodi, 0, 1)); ?>
 
                                 </div>

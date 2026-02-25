@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrasi - Pilihanku</title>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/Pilihanku3.png')); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -431,6 +432,53 @@
 
         .register-right > *:nth-child(1) { animation-delay: 0.2s; }
         .register-right > *:nth-child(2) { animation-delay: 0.3s; }
+
+        /* Password Toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .password-toggle i {
+            font-size: 1rem;
+        }
+
+        /* Custom Select Styling */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+        }
+
+        /* Required field indicator */
+        .required-field::after {
+            content: ' *';
+            color: var(--danger-color);
+            font-weight: bold;
+            margin-left: 2px;
+        }
     </style>
 </head>
 <body>
@@ -487,7 +535,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="name" class="form-label">
+                                <label for="name" class="form-label required-field">
                                     <i class="fas fa-user"></i>
                                     Nama Lengkap
                                 </label>
@@ -496,7 +544,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="nisn" class="form-label">
+                                <label for="nisn" class="form-label required-field">
                                     <i class="fas fa-id-card"></i>
                                     NISN
                                 </label>
@@ -506,7 +554,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="email" class="form-label">
+                        <label for="email" class="form-label required-field">
                             <i class="fas fa-envelope"></i>
                             Email
                         </label>
@@ -516,26 +564,43 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="jurusan_sma" class="form-label">
+                                <label for="jurusan_sma" class="form-label required-field">
                                     <i class="fas fa-graduation-cap"></i>
                                     Jurusan SMA/SMK
                                 </label>
-                                <input type="text" class="form-control" id="jurusan_sma" name="jurusan_sma" value="<?php echo e(old('jurusan_sma')); ?>" required placeholder="Contoh: IPA, IPS, Teknik Komputer">
+                                <select class="form-control" id="jurusan_sma_select" onchange="handleJurusanChange(this)">
+                                    <option value="">Pilih Jurusan</option>
+                                    <option value="IPA" <?php echo e(old('jurusan_sma') == 'IPA' ? 'selected' : ''); ?>>IPA</option>
+                                    <option value="IPS" <?php echo e(old('jurusan_sma') == 'IPS' ? 'selected' : ''); ?>>IPS</option>
+                                    <option value="Bahasa" <?php echo e(old('jurusan_sma') == 'Bahasa' ? 'selected' : ''); ?>>Bahasa</option>
+                                    <option value="Lainnya" <?php echo e(old('jurusan_sma') && !in_array(old('jurusan_sma'), ['IPA', 'IPS', 'Bahasa']) ? 'selected' : ''); ?>>Lainnya</option>
+                                </select>
+                                <input type="text" class="form-control mt-2" id="jurusan_sma_custom" placeholder="Ketik jurusan Anda" style="display: <?php echo e(old('jurusan_sma') && !in_array(old('jurusan_sma'), ['IPA', 'IPS', 'Bahasa']) ? 'block' : 'none'); ?>;" value="<?php echo e(old('jurusan_sma') && !in_array(old('jurusan_sma'), ['IPA', 'IPS', 'Bahasa']) ? old('jurusan_sma') : ''); ?>">
+                                <input type="hidden" id="jurusan_sma" name="jurusan_sma" value="<?php echo e(old('jurusan_sma')); ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="tahun_lulus" class="form-label">
+                                <label for="tahun_lulus" class="form-label required-field">
                                     <i class="fas fa-calendar"></i>
                                     Tahun Lulus
                                 </label>
-                                <input type="text" class="form-control" id="tahun_lulus" name="tahun_lulus" value="<?php echo e(old('tahun_lulus')); ?>" required placeholder="Contoh: 2023">
+                                <select class="form-control" id="tahun_lulus" name="tahun_lulus" required>
+                                    <option value="">Pilih Tahun Lulus</option>
+                                    <?php
+                                        $currentYear = date('Y');
+                                        for ($year = $currentYear; $year >= 2015; $year--) {
+                                            $selected = old('tahun_lulus') == $year ? 'selected' : '';
+                                            echo "<option value='$year' $selected>$year</option>";
+                                        }
+                                    ?>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="asal_sekolah" class="form-label">
+                        <label for="asal_sekolah" class="form-label required-field">
                             <i class="fas fa-school"></i>
                             Asal Sekolah
                         </label>
@@ -545,21 +610,31 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="password" class="form-label">
+                                <label for="password" class="form-label required-field">
                                     <i class="fas fa-lock"></i>
                                     Password
                                 </label>
-                                <input type="password" class="form-control" id="password" name="password" required placeholder="Minimal 8 karakter">
+                                <div class="password-wrapper">
+                                    <input type="password" class="form-control" id="password" name="password" required placeholder="Minimal 8 karakter">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                        <i class="fas fa-eye" id="password-icon"></i>
+                                    </button>
+                                </div>
                                 <div class="form-text">Minimal 8 karakter</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="password_confirmation" class="form-label">
+                                <label for="password_confirmation" class="form-label required-field">
                                     <i class="fas fa-lock"></i>
                                     Konfirmasi Password
                                 </label>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required placeholder="Ulangi password">
+                                <div class="password-wrapper">
+                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required placeholder="Ulangi password">
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation')">
+                                        <i class="fas fa-eye" id="password_confirmation-icon"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -602,6 +677,75 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-icon');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Handle jurusan dropdown change
+        function handleJurusanChange(selectElement) {
+            const customInput = document.getElementById('jurusan_sma_custom');
+            const hiddenInput = document.getElementById('jurusan_sma');
+            
+            if (selectElement.value === 'Lainnya') {
+                customInput.style.display = 'block';
+                customInput.focus();
+                // Clear hidden input when switching to custom
+                hiddenInput.value = '';
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+                // Set hidden input to selected value
+                hiddenInput.value = selectElement.value;
+            }
+        }
+
+        // Sync custom input to hidden field
+        function syncCustomJurusan() {
+            const customInput = document.getElementById('jurusan_sma_custom');
+            const hiddenInput = document.getElementById('jurusan_sma');
+            
+            if (customInput.style.display === 'block' && customInput.value.trim() !== '') {
+                hiddenInput.value = customInput.value.trim();
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const jurusanSelect = document.getElementById('jurusan_sma_select');
+            const customInput = document.getElementById('jurusan_sma_custom');
+            const hiddenInput = document.getElementById('jurusan_sma');
+            
+            // Add input event listener to custom input
+            customInput.addEventListener('input', syncCustomJurusan);
+            
+            // Check if custom value exists on page load (for validation errors)
+            const currentValue = hiddenInput.value;
+            const standardOptions = ['IPA', 'IPS', 'Bahasa'];
+            
+            if (currentValue && !standardOptions.includes(currentValue)) {
+                // Custom value - show custom input
+                jurusanSelect.value = 'Lainnya';
+                customInput.style.display = 'block';
+                customInput.value = currentValue;
+            } else if (currentValue && standardOptions.includes(currentValue)) {
+                // Standard option - select it
+                jurusanSelect.value = currentValue;
+            }
+        });
+    </script>
 </body>
 </html>
 <?php /**PATH C:\laragon\tugas_akhir\resources\views/auth/register.blade.php ENDPATH**/ ?>

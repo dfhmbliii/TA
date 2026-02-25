@@ -57,19 +57,31 @@
                     <div class="col-md-3">
                         <div class="mb-3">
                             <small class="text-muted d-block">Minat</small>
-                            <span class="badge bg-danger"><?php echo e(ucwords(str_replace('_', ' ', $data['kriteria_minat'] ?? '-'))); ?></span>
+                            <?php
+                                $minatCode = $data['kriteria_minat'] ?? null;
+                                $minatText = $minatCode ? ($minatCategories[$minatCode]->nama ?? $minatCode) : '-';
+                            ?>
+                            <span class="badge bg-danger"><?php echo e($minatText); ?></span>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
                             <small class="text-muted d-block">Bakat</small>
-                            <span class="badge bg-warning text-dark"><?php echo e(ucfirst(str_replace('_', ' ', $data['kriteria_bakat'] ?? '-'))); ?></span>
+                            <?php
+                                $bakatCode = $data['kriteria_bakat'] ?? null;
+                                $bakatText = $bakatCode ? ($bakatCategories[$bakatCode]->nama ?? $bakatCode) : '-';
+                            ?>
+                            <span class="badge bg-warning text-dark"><?php echo e($bakatText); ?></span>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="mb-3">
                             <small class="text-muted d-block">Prospek Karir</small>
-                            <span class="badge bg-success"><?php echo e(ucwords(str_replace('_', ' ', $data['kriteria_prospek_karir'] ?? '-'))); ?></span>
+                            <?php
+                                $karirCode = $data['kriteria_karir'] ?? null;
+                                $karirText = $karirCode ? ($karirCategories[$karirCode]->nama ?? $karirCode) : '-';
+                            ?>
+                            <span class="badge bg-success"><?php echo e($karirText); ?></span>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -94,7 +106,7 @@
                         <i class="fas fa-list-ol me-2"></i>
                         Ranking Program Studi (Top <?php echo e(count($prodiScores)); ?>)
                     </h6>
-                    <a href="<?php echo e(route('siswa-spk.form')); ?>" class="btn btn-sm btn-outline-primary">
+                    <a href="<?php echo e(route('siswa-spk.form')); ?>" class="btn btn-sm btn-outline-primary d-print-none">
                         <i class="fas fa-redo me-1"></i>Analisis Ulang
                     </a>
                 </div>
@@ -109,7 +121,7 @@
                                 <th width="20%">Fakultas</th>
                                 <th class="text-center" width="10%">Skor Total</th>
                                 <th class="text-center" width="15%">Kategori</th>
-                                <th class="text-center" width="10%">Detail</th>
+                                <th class="text-center d-print-none" width="10%">Detail</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -128,7 +140,8 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center me-2">
+                                        <!-- Hide Initials in Print -->
+                                        <div class="avatar-sm bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center me-2 d-print-none">
                                             <?php echo e(substr($item['prodi']->nama_prodi, 0, 2)); ?>
 
                                         </div>
@@ -165,13 +178,13 @@
 
                                     </span>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center d-print-none">
                                     <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#detail<?php echo e($index); ?>">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
                             </tr>
-                            <tr class="collapse" id="detail<?php echo e($index); ?>">
+                            <tr class="collapse d-print-none" id="detail<?php echo e($index); ?>">
                                 <td colspan="6" class="bg-light">
                                     <div class="p-3">
                                         <h6 class="mb-3"><i class="fas fa-chart-pie me-2"></i>Detail Skor per Kriteria</h6>
@@ -207,7 +220,7 @@
 </div>
 
 <!-- Action Buttons -->
-<div class="row g-4 mt-2">
+<div class="row g-4 mt-2 d-print-none">
     <div class="col-12">
         <div class="d-flex gap-2 justify-content-center">
             <a href="<?php echo e(route('siswa.dashboard')); ?>" class="btn btn-outline-secondary">
@@ -241,19 +254,61 @@
     }
     
     @media print {
-        .btn, .content-header p, .card-header .btn, 
-        .d-flex.gap-2.justify-content-center,
-        button[onclick="window.print()"] {
+        /* Remove default browser headers/footers */
+        @page {
+            margin: 1cm;
+            size: auto;
+        }
+
+        /* Force graphics/colors */
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background: white !important;
+        }
+
+        /* Hide unwanted UI elements */
+        .sidebar, .navbar, .sidebar-toggle, .btn, .d-print-none, .content-header p, .content-header h1 {
             display: none !important;
         }
-        
-        body {
-            background: white;
+
+        /* Specifically hide the main "Hasil Analisis SPK" text */
+        .content-header {
+            display: none !important;
+        }
+
+        /* Adjust layout to full width */
+        .main-content {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            background: white !important;
+        }
+
+        /* Card refinements for print */
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            margin-bottom: 20px !important;
+        }
+
+        .card-header {
+            background-color: #f8f9fa !important;
+            border-bottom: 1px solid #ddd !important;
+        }
+
+        /* Ensure badges have colors */
+        .badge {
+            border: 1px solid transparent;
+            color: black !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         
-        .card {
-            box-shadow: none !important;
-            page-break-inside: avoid;
+        /* Table adjustments */
+        table {
+            width: 100% !important;
         }
     }
 </style>

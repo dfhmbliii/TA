@@ -4,457 +4,526 @@
     <meta charset="UTF-8">
     <title>Hasil Analisis SPK - <?php echo e($result->siswa->nama ?? 'Siswa'); ?></title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        /* Base Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #1f2937;
-            line-height: 1.6;
-            background: #f9fafb;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 40px 40px 60px 40px;
+            font-size: 12px;
+        }
+
+        /* Footer Fixed on Every Page */
+        @page {
+            margin: 0px;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 30px;
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            left: 40px;
+            right: 40px;
+            height: 30px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #9ca3af;
+            background-color: white;
         }
+
+        /* Utilities */
+        .w-100 { width: 100%; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .text-muted { color: #6c757d; }
         
         /* Header */
-        .header {
-            text-align: center;
+        .header-container {
             margin-bottom: 30px;
+            border-bottom: 3px solid #0d6efd;
             padding-bottom: 20px;
-            border-bottom: 3px solid #4f46e5;
+            margin-top: 40px;
         }
         
-        .header h1 {
-            color: #4f46e5;
-            font-size: 28px;
-            margin-bottom: 8px;
+        .header-table {
+            width: 100%;
         }
         
-        .header p {
+        .logo-img {
+            height: 45px;
+            width: auto;
+        }
+
+        .app-name {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0d6efd;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 15px;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
             color: #6b7280;
-            font-size: 14px;
+            margin-top: 5px;
         }
-        
-        /* Info Box */
-        .info-box {
-            background: white;
+
+        /* CARD STYLE */
+        .card {
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #6b7280;
-            font-size: 13px;
-        }
-        
-        .info-value {
-            font-weight: 500;
-            color: #111827;
-            font-size: 13px;
-        }
-        
-        /* Score Card */
-        .score-card {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
             border-radius: 12px;
-            padding: 30px;
+            padding: 20px;
             margin-bottom: 25px;
-            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
-        .score-value {
-            font-size: 48px;
+
+        /* 1. BEST RECOMMENDATION CARD */
+        .rec-card {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border-left: 5px solid #0d6efd;
+        }
+
+        .rec-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #d97706;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .icon-small {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .prodi-highlight {
+            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 10px;
+            color: #0f172a;
+            margin-bottom: 5px;
+            line-height: 1.2;
         }
-        
-        .score-label {
+
+        .fakultas-highlight {
             font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 15px;
+            color: #64748b;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
-        
-        .score-badge {
+
+        .score-box {
             display: inline-block;
-            padding: 8px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            font-weight: 600;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .score-val {
+            font-size: 32px;
+            font-weight: 800;
+            color: #15803d;
+            line-height: 1;
+        }
+        
+        .score-cat {
             font-size: 14px;
+            color: #166534;
+            font-weight: 600;
+            margin-left: 10px;
         }
-        
-        /* Section */
-        .section {
-            margin-bottom: 25px;
+
+
+        /* 2. DATA INPUT TABLE */
+        .input-card {
+            border-left: 5px solid #6366f1; /* Indigo */
         }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #111827;
+
+        .input-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #374151;
             margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e7eb;
         }
-        
-        /* Table */
-        table {
+
+        .input-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+        }
+
+        .input-table th {
+            text-align: left;
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+            width: 25%;
+        }
+
+        .input-table td {
+            vertical-align: top;
+            padding-right: 15px;
+        }
+
+        .input-box {
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+            border-left: 3px solid #9ca3af;
+            min-height: 20px;
+        }
+
+        /* Specific Input Colors */
+        .input-box.minat { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+        .input-box.bakat { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+        .input-box.karir { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+        .input-box.nilai { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+
+
+        /* 3. RANKING TABLE */
+        .rank-header {
+            font-size: 14px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .table-rank {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             overflow: hidden;
         }
-        
-        th {
-            background: #f3f4f6;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            color: #374151;
+
+        .table-rank th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
         }
-        
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 13px;
+
+        .table-rank td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
         }
-        
-        tr:last-child td {
+
+        .table-rank tr:last-child td {
             border-bottom: none;
         }
-        
-        tr:hover {
-            background: #f9fafb;
-        }
-        
-        /* Badge */
-        .badge {
+
+        /* Rank Badges */
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            line-height: 24px; /* Ensure vertical centering */
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 11px;
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
+            vertical-align: middle; /* Vertical align middle */
         }
-        
-        .badge-danger { background: #fee2e2; color: #991b1b; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-info { background: #dbeafe; color: #1e40af; }
-        
-        /* Grid */
-        .grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .grid-item {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .grid-item-label {
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .grid-item-value {
-            font-size: 16px;
+        .rank-1 { background-color: #FFD700; color: #783f04; }
+        .rank-2 { background-color: #C0C0C0; color: #404040; }
+        .rank-3 { background-color: #CD7F32; color: #fff; }
+        .rank-other { background-color: #f1f5f9; color: #64748b; }
+
+        /* Faculty Colors */
+        .fak-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
             font-weight: 700;
-            color: #111827;
+            display: inline-block;
         }
-        
-        /* Recommendation Box */
-        .recommendation {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-        
-        .recommendation-title {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .recommendation-prodi {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-        
-        .recommendation-score {
-            font-size: 32px;
-            font-weight: 800;
-        }
-        
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 11px;
-        }
-        
-        /* Page Break */
-        .page-break {
-            page-break-after: always;
-        }
-        
-        @page {
-            margin: 20mm;
-            size: A4;
-        }
+        .fak-ri { background: #dcfce7; color: #15803d; } /* Green */
+        .fak-te { background: #dbeafe; color: #1d4ed8; } /* Blue */
+        .fak-if { background: #fef9c3; color: #854d0e; } /* Yellow */
+        .fak-ik { background: #fee2e2; color: #b91c1c; } /* Red */
+        .fak-def { background: #f3f4f6; color: #4b5563; } /* Grey */
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>PILIHANKU</h1>
-            <p>Sistem Pendukung Keputusan Pemilihan Program Studi</p>
-        </div>
 
-        <!-- Student Info -->
-        <div class="info-box">
-            <div class="info-row">
-                <span class="info-label">Nama Siswa</span>
-                <span class="info-value"><?php echo e($result->siswa->nama ?? '-'); ?></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">NISN</span>
-                <span class="info-value"><?php echo e($result->siswa->nisn ?? '-'); ?></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email</span>
-                <span class="info-value"><?php echo e($result->siswa->email ?? '-'); ?></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Asal Sekolah</span>
-                <span class="info-value"><?php echo e($result->siswa->asal_sekolah ?? '-'); ?></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Jurusan</span>
-                <span class="info-value"><?php echo e($result->siswa->jurusan ?? '-'); ?></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Tanggal Analisis</span>
-                <span class="info-value"><?php echo e($result->created_at->format('d F Y, H:i')); ?></span>
-            </div>
-        </div>
+    <?php
+        use App\Models\Prodi;
+        use App\Models\MinatCategory;
+        use App\Models\BakatCategory;
+        use App\Models\KarirCategory;
+        
+        // --- DATA PREPARATION --- //
+        $inputData = is_array($result->input_data) ? $result->input_data : [];
+        if (empty($inputData) && is_string($result->input_data)) {
+            $inputData = json_decode($result->input_data, true) ?? [];
+        }
 
-        <!-- Score Card -->
-        <div class="score-card">
-            <div class="score-label">TOTAL SKOR ANALISIS</div>
-            <div class="score-value"><?php echo e(number_format($result->total_score, 2)); ?></div>
-            <div class="score-badge"><?php echo e($result->category); ?></div>
-        </div>
+        $allRecommendations = is_array($result->rekomendasi_prodi) ? $result->rekomendasi_prodi : [];
+        if (empty($allRecommendations) && is_string($result->rekomendasi_prodi)) {
+             $allRecommendations = json_decode($result->rekomendasi_prodi, true) ?? [];
+        }
+        if (isset($allRecommendations['nama_prodi'])) {
+            $allRecommendations = [$allRecommendations];
+        }
+        
+        // Take top 5
+        $topRecommendations = array_slice($allRecommendations, 0, 5);
+        $topResult = $topRecommendations[0] ?? null;
 
-        <!-- Recommendation - Moved here before other details -->
-        <?php
-            $prodiRec = $result->rekomendasi_prodi;
-            if (is_string($prodiRec)) {
-                $prodiRec = json_decode($prodiRec, true);
+        // --- LOOKUP HELPERS --- //
+        
+        // Get Full Text for Minat
+        function getMinatText($code) {
+            if (!$code) return '-';
+            $item = MinatCategory::where('kode', $code)->first();
+            // If not found by code, maybe the input IS the code/name, so return formatted
+            return $item ? $item->nama : ucwords(str_replace('_', ' ', strtolower($code)));
+        }
+
+        // Get Full Text for Bakat
+        function getBakatText($code) {
+            if (!$code) return '-';
+            $item = BakatCategory::where('kode', $code)->first();
+            return $item ? $item->nama : ucwords(str_replace('_', ' ', strtolower($code)));
+        }
+
+        // Get Full Text for Karir
+        function getKarirText($code) {
+            if (!$code) return '-';
+            $item = KarirCategory::where('kode', $code)->first();
+            return $item ? $item->nama : ucwords(str_replace('_', ' ', strtolower($code)));
+        }
+
+        // Helper: Get Faculty Object & Color Logic
+        function getFakultasDetails($prodiName) {
+            $prodi = Prodi::where('nama_prodi', $prodiName)->first();
+            $nama = $prodi ? $prodi->nama_fakultas : '-';
+            
+            $class = 'fak-def';
+            if (stripos($nama, 'Rekayasa Industri') !== false) $class = 'fak-ri';
+            elseif (stripos($nama, 'Teknik Elektro') !== false) $class = 'fak-te';
+            elseif (stripos($nama, 'Informatika') !== false) $class = 'fak-if';
+            elseif (stripos($nama, 'Industri Kreatif') !== false) $class = 'fak-ik';
+
+            return ['nama' => $nama, 'class' => $class];
+        }
+
+        $topFakultas = $topResult ? getFakultasDetails($topResult['nama_prodi']) : ['nama' => '-', 'class' => 'fak-def'];
+
+        // --- IMAGE TO BASE64 HELPER --- //
+        function imgBase64($path) {
+            if (file_exists($path)) {
+                $type = pathinfo($path, PATHINFO_EXTENSION);
+                $data = file_get_contents($path);
+                return 'data:image/' . $type . ';base64,' . base64_encode($data);
             }
-            $prodiScore = isset($prodiRec['score']) ? floatval($prodiRec['score']) : $result->total_score;
-            $scoreCategory = $prodiScore >= 80 ? 'Sangat Sesuai' : ($prodiScore >= 70 ? 'Sesuai' : ($prodiScore >= 60 ? 'Cukup Sesuai' : 'Kurang Sesuai'));
-        ?>
+            return '';
+        }
+        
+        // Check multiple possible locations for logo
+        $logoPath = '';
+        // Prioritize user specified filename
+        if (file_exists(public_path('img/pilihanku3.png'))) {
+            $logoPath = public_path('img/pilihanku3.png');
+        } elseif (file_exists(public_path('images/pilihanku3.png'))) {
+            $logoPath = public_path('images/pilihanku3.png');
+        } elseif (file_exists(base_path('public/img/pilihanku3.png'))) {
+             $logoPath = base_path('public/img/pilihanku3.png');
+        }
+        // Fallbacks
+        elseif (file_exists(public_path('img/logo.png'))) {
+            $logoPath = public_path('img/logo.png');
+        }
 
-        <div class="recommendation">
-            <div class="recommendation-title">✨ Rekomendasi Program Studi Terbaik</div>
-            <div class="recommendation-prodi"><?php echo e($prodiRec['nama_prodi'] ?? 'Program Studi Belum Tersedia'); ?></div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-size: 12px; opacity: 0.9;">Skor Kesesuaian</div>
-                    <div class="recommendation-score"><?php echo e(number_format($prodiScore, 2)); ?>/100</div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 12px; opacity: 0.9;">Tingkat Kesesuaian</div>
-                    <div style="font-size: 20px; font-weight: 700; margin-top: 5px;"><?php echo e($scoreCategory); ?></div>
-                </div>
+        $logoSrc = $logoPath ? imgBase64($logoPath) : '';
+        $trophySrc = imgBase64(public_path('img/icons/trophy.png'));
+        $clipboardSrc = imgBase64(public_path('img/icons/clipboard.png'));
+        $chartSrc = imgBase64(public_path('img/icons/chart.png'));
+    ?>
+
+    <!-- HEADER -->
+    <div class="header-container" style="border-bottom: 3px solid #0d6efd; margin-bottom: 25px; padding-bottom: 15px;">
+        <table class="header-table">
+            <tr>
+                <td width="60%" style="vertical-align: middle;">
+                    <!-- Logo Only (Larger) -->
+                    <?php if($logoSrc): ?>
+                        <img src="<?php echo e($logoSrc); ?>" style="height: 75px; width: auto;" alt="Logo">
+                    <?php else: ?>
+                        <h2 style="margin:0; font-size: 32px; color: #0d6efd;">Pilihanku</h2>
+                    <?php endif; ?>
+                </td>
+                <td width="40%" align="right" style="vertical-align: bottom;">
+                    <div style="font-size: 11px; color: #6b7280;">
+                        <b><?php echo e($result->siswa->name ?? 'Siswa'); ?></b><br>
+                        NISN: <?php echo e($result->siswa->nisn ?? '-'); ?><br>
+                        <?php echo e($result->created_at->format('d F Y, H:i')); ?>
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <!-- 1. BEST RESULT CARD -->
+    <?php if($topResult): ?>
+    <div class="card rec-card">
+        <div class="rec-label">
+            <?php if($trophySrc): ?><img src="<?php echo e($trophySrc); ?>" class="icon-small" alt="trophy"><?php endif; ?> 
+            REKOMENDASI UTAMA
+        </div>
+        
+        <div class="prodi-highlight">
+            <?php echo e($topResult['nama_prodi']); ?>
+
+        </div>
+        
+        <div class="fakultas-highlight" style="display: flex; align-items: center;">
+             <span class="fak-badge <?php echo e($topFakultas['class']); ?>" style="font-size: 12px; margin-right: 10px;">
+                <?php echo e($topFakultas['nama']); ?>
+
+             </span>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <div class="score-box">
+                <span class="score-val"><?php echo e(number_format($result->total_score, 2)); ?></span>
+                <span class="score-cat"><?php echo e($result->category); ?></span>
             </div>
-        </div>
-
-        <!-- Data Input -->
-        <div class="section">
-            <h2 class="section-title">Data Input</h2>
-            <?php
-                $inputData = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
-                $nilaiMapel = isset($inputData['nilai_mapel']) ? $inputData['nilai_mapel'] : [];
-                $avgNilai = count($nilaiMapel) > 0 ? number_format(array_sum(array_map('floatval', $nilaiMapel)) / count($nilaiMapel), 2) : '0.00';
-            ?>
-            
-            <table>
-                <tr>
-                    <th>Minat</th>
-                    <th>Bakat</th>
-                    <th>Prospek Karir</th>
-                    <th>Rata-rata Nilai</th>
-                </tr>
-                <tr>
-                    <td><span class="badge badge-danger"><?php echo e(strtoupper($inputData['minat'] ?? '-')); ?></span></td>
-                    <td><span class="badge badge-warning"><?php echo e(strtoupper($inputData['bakat'] ?? '-')); ?></span></td>
-                    <td><span class="badge badge-success"><?php echo e(strtoupper($inputData['prospek_karir'] ?? '-')); ?></span></td>
-                    <td><span class="badge badge-info"><?php echo e($avgNilai); ?></span></td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Nilai Kriteria -->
-        <div class="section">
-            <h2 class="section-title">Nilai Kriteria</h2>
-            <?php
-                $criteriaValues = is_array($result->criteria_values) ? $result->criteria_values : json_decode($result->criteria_values ?? '[]', true);
-            ?>
-            
-            <div class="grid-4">
-                <div class="grid-item">
-                    <div class="grid-item-label">Minat</div>
-                    <div class="grid-item-value"><?php echo e(number_format($criteriaValues['minat'] ?? 0, 2)); ?></div>
-                </div>
-                <div class="grid-item">
-                    <div class="grid-item-label">Bakat</div>
-                    <div class="grid-item-value"><?php echo e(number_format($criteriaValues['bakat'] ?? 0, 2)); ?></div>
-                </div>
-                <div class="grid-item">
-                    <div class="grid-item-label">Prospek Karir</div>
-                    <div class="grid-item-value"><?php echo e(number_format($criteriaValues['prospek_karir'] ?? 0, 2)); ?></div>
-                </div>
-                <div class="grid-item">
-                    <div class="grid-item-label">Akademik</div>
-                    <div class="grid-item-value"><?php echo e(number_format($criteriaValues['akademik'] ?? 0, 2)); ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bobot Kriteria (Weight) -->
-        <div class="section">
-            <h2 class="section-title">Bobot Kriteria (Weight)</h2>
-            <?php
-                $weights = is_array($result->weights) ? $result->weights : json_decode($result->weights ?? '[]', true);
-            ?>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Kriteria</th>
-                        <th>Visualisasi</th>
-                        <th style="text-align: right;">Bobot</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Minat</td>
-                        <td>
-                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                <div style="width: <?php echo e($weights['minat'] ?? 0); ?>%; background: #4f46e5; height: 100%;"></div>
-                            </div>
-                        </td>
-                        <td style="text-align: right; font-weight: 600;"><?php echo e(number_format($weights['minat'] ?? 0, 2)); ?>%</td>
-                    </tr>
-                    <tr>
-                        <td>Bakat</td>
-                        <td>
-                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                <div style="width: <?php echo e($weights['bakat'] ?? 0); ?>%; background: #7c3aed; height: 100%;"></div>
-                            </div>
-                        </td>
-                        <td style="text-align: right; font-weight: 600;"><?php echo e(number_format($weights['bakat'] ?? 0, 2)); ?>%</td>
-                    </tr>
-                    <tr>
-                        <td>Prospek Karir</td>
-                        <td>
-                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                <div style="width: <?php echo e($weights['prospek_karir'] ?? 0); ?>%; background: #10b981; height: 100%;"></div>
-                            </div>
-                        </td>
-                        <td style="text-align: right; font-weight: 600;"><?php echo e(number_format($weights['prospek_karir'] ?? 0, 2)); ?>%</td>
-                    </tr>
-                    <tr>
-                        <td>Akademik</td>
-                        <td>
-                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                <div style="width: <?php echo e($weights['akademik'] ?? 0); ?>%; background: #f59e0b; height: 100%;"></div>
-                            </div>
-                        </td>
-                        <td style="text-align: right; font-weight: 600;"><?php echo e(number_format($weights['akademik'] ?? 0, 2)); ?>%</td>
-                    </tr>
-                    <tr style="background: #f9fafb;">
-                        <td colspan="2" style="font-weight: 700;">Total</td>
-                        <td style="text-align: right; font-weight: 700;">100%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Detail Skor Rekomendasi -->
-        <?php if(isset($prodiRec['details']) && is_array($prodiRec['details']) && count($prodiRec['details']) > 0): ?>
-        <div class="section">
-            <h2 class="section-title">Detail Skor Rekomendasi</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Kriteria</th>
-                        <th style="text-align: right;">Nilai</th>
-                        <th style="text-align: right;">Weight</th>
-                        <th style="text-align: right;">Weighted</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $__currentLoopData = $prodiRec['details']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <tr>
-                        <td><?php echo e(ucwords(str_replace('_', ' ', $key))); ?></td>
-                        <td style="text-align: right;"><?php echo e(number_format($detail['score'] ?? 0, 2)); ?></td>
-                        <td style="text-align: right;"><?php echo e(number_format(($detail['weight'] ?? 0) * 100, 2)); ?>%</td>
-                        <td style="text-align: right; font-weight: 600;"><?php echo e(number_format($detail['weighted'] ?? 0, 2)); ?></td>
-                    </tr>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tbody>
-            </table>
-        </div>
-        <?php endif; ?>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p><strong>Dokumen ini digenerate otomatis oleh sistem PILIHANKU</strong></p>
-            <p>© <?php echo e(date('Y')); ?> - Sistem Pendukung Keputusan Pemilihan Program Studi</p>
         </div>
     </div>
+    <?php endif; ?>
+
+    <!-- 2. DATA INPUT (TABLE FORMAT) -->
+    <div class="card input-card">
+        <div class="input-header">
+            <?php if($clipboardSrc): ?><img src="<?php echo e($clipboardSrc); ?>" class="icon-small" alt="clipboard"><?php endif; ?>
+            DATA INPUT SISWA
+        </div>
+        
+        <table class="input-table">
+            <thead>
+                <tr>
+                    <th width="30%">Minat</th>
+                    <th width="30%">Bakat</th>
+                    <th width="20%">Prospek Karir</th>
+                    <th width="20%">Nilai Rata-rata</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="input-box minat">
+                            <?php echo e(getMinatText($inputData['minat'] ?? null)); ?>
+
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-box bakat">
+                            <?php echo e(getBakatText($inputData['bakat'] ?? null)); ?>
+
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-box karir">
+                             <?php echo e(getKarirText($inputData['prospek_karir'] ?? null)); ?>
+
+                        </div>
+                    </td>
+                    <td>
+                        <?php
+                            $nilaiArr = $inputData['nilai_mapel'] ?? [];
+                            $avg = count($nilaiArr) > 0 ? array_sum($nilaiArr) / count($nilaiArr) : 0;
+                        ?>
+                        <div class="input-box nilai">
+                            <?php echo e(number_format($avg, 2)); ?>
+
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 3. RANKING TABLE -->
+    <div class="rank-header">
+        <?php if($chartSrc): ?><img src="<?php echo e($chartSrc); ?>" class="icon-small" alt="chart"><?php endif; ?>
+        PERINGKAT PROGRAM STUDI (TOP 5)
+    </div>
+
+    <table class="table-rank">
+        <thead>
+            <tr>
+                <th width="10%" class="text-center">RANK</th>
+                <th width="40%">PROGRAM STUDI</th>
+                <th width="25%">FAKULTAS</th>
+                <th width="25%" class="text-right">SKOR KESESUAIAN</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $__currentLoopData = $topRecommendations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rec): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
+                $fakDetails = getFakultasDetails($rec['nama_prodi']);
+                $score = isset($rec['score']) ? floatval($rec['score']) : 0;
+                
+                $rankClass = 'rank-other';
+                if ($index === 0) $rankClass = 'rank-1';
+                if ($index === 1) $rankClass = 'rank-2';
+                if ($index === 2) $rankClass = 'rank-3';
+            ?>
+            <tr>
+                <td class="text-center">
+                    <span class="rank-badge <?php echo e($rankClass); ?>"><?php echo e($index + 1); ?></span>
+                </td>
+                <td>
+                    <div style="font-weight: bold; color: #1f2937;"><?php echo e($rec['nama_prodi']); ?></div>
+                </td>
+                <td>
+                    <span class="fak-badge <?php echo e($fakDetails['class']); ?>"><?php echo e($fakDetails['nama']); ?></span>
+                </td>
+                <td class="text-right">
+                    <div style="font-weight: 800; color: #374151; font-size: 13px;"><?php echo e(number_format($score, 2)); ?></div>
+                    <div style="font-size: 10px; color: #6b7280;"><?php echo e($rec['percentage'] ?? ''); ?></div>
+                </td>
+            </tr>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </tbody>
+    </table>
+
+    <!-- FOOTER (Fixed) -->
+    <div class="footer">
+        dicetak otomatis oleh sistem <b>Pilihanku</b> pada <?php echo e(date('d/m/Y H:i')); ?> | &copy; <?php echo e(date('Y')); ?>
+
+    </div>
+
 </body>
 </html>
 <?php /**PATH C:\laragon\tugas_akhir\resources\views/pdf/spk-result.blade.php ENDPATH**/ ?>

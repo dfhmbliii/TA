@@ -1,5 +1,8 @@
 @extends('layouts.auth')
-@section('title','Lupa Password')
+@section('title','Lupa Password - Pilihanku')
+@section('head')
+    <link rel="icon" type="image/png" href="{{ asset('images/Pilihanku3.png') }}">
+@endsection
 @section('content')
 <div class="mb-4 text-center">
     <h1 class="h4 fw-bold">Lupa Password</h1>

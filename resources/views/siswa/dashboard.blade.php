@@ -113,6 +113,7 @@
                                 <th>Tanggal</th>
                                 <th>Total Skor</th>
                                 <th>Kategori</th>
+                                <th>Rekomendasi</th>
                                 <th>Kriteria</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
@@ -122,47 +123,76 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>
-                                    {{ $result->created_at->format('d M Y, H:i') }}
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar-day text-muted me-2"></i>
+                                        <span>{{ $result->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <small class="text-muted ps-4">{{ $result->created_at->format('H:i') }} WIB</small>
                                 </td>
                                 <td>
-                                    <strong class="text-primary">{{ number_format($result->total_score, 2) }}</strong>
+                                    <span class="fw-bold text-primary">{{ number_format($result->total_score, 2) }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-{{ $result->category == 'Sangat Sesuai' ? 'success' : ($result->category == 'Sesuai' ? 'primary' : ($result->category == 'Cukup Sesuai' ? 'info' : 'warning')) }}">
+                                    <span class="badge rounded-pill bg-{{ 
+                                        $result->category == 'Sangat Sesuai' ? 'success' : 
+                                        ($result->category == 'Sesuai' ? 'primary' : 
+                                        ($result->category == 'Cukup Sesuai' ? 'info' : 'warning')) 
+                                    }} px-3">
                                         {{ $result->category }}
                                     </span>
                                 </td>
                                 <td>
-                                    <small class="text-muted">
+                                    @php
+                                        $rekomendasi = is_array($result->rekomendasi_prodi) ? $result->rekomendasi_prodi : json_decode($result->rekomendasi_prodi, true);
+                                    @endphp
+                                    @if($rekomendasi && count($rekomendasi) > 0)
+                                        <div class="d-flex align-items-center text-dark">
+                                            <div class="bg-warning bg-opacity-25 text-warning rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i class="fas fa-trophy fa-sm"></i>
+                                            </div>
+                                            <span class="fw-semibold small">{{ $rekomendasi[0]['nama_prodi'] ?? '-' }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1" style="font-size: 0.85rem;">
                                         @php
                                             $input = is_array($result->input_data) ? $result->input_data : json_decode($result->input_data, true);
                                         @endphp
                                         @if($input && is_array($input))
-                                            Minat: {{ ucwords(str_replace('_', ' ', $input['minat'] ?? '-')) }}, 
-                                            Bakat: {{ ucwords(str_replace('_', ' ', $input['bakat'] ?? '-')) }}
+                                            @php
+                                                $minatCode = $input['minat'] ?? null;
+                                                $minatText = $minatCode ? ($minatCategories[$minatCode]->nama ?? ucwords(str_replace('_', ' ', $minatCode))) : '-';
+                                                
+                                                $bakatCode = $input['bakat'] ?? null;
+                                                $bakatText = $bakatCode ? ($bakatCategories[$bakatCode]->nama ?? ucwords(str_replace('_', ' ', $bakatCode))) : '-';
+                                            @endphp
+                                            <div><span class="text-muted">Minat:</span> <span class="fw-medium">{{ $minatText }}</span></div>
+                                            <div><span class="text-muted">Bakat:</span> <span class="fw-medium text-truncate d-inline-block" style="max-width: 250px; vertical-align: bottom;">{{ $bakatText }}</span></div>
                                         @else
-                                            -
+                                            <span class="text-muted">-</span>
                                         @endif
-                                    </small>
+                                    </div>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-primary" data-detail-btn 
-                                        data-result-id="{{ $result->id }}" 
-                                        data-total-score="{{ $result->total_score }}" 
-                                        data-category="{{ $result->category }}" 
-                                        data-created="{{ $result->created_at->format('d F Y, H:i:s') }}">
-                                        <i class="fas fa-eye me-1"></i>
-                                        Detail
-                                    </button>
-                                    <a href="{{ route('spk.view-pdf', $result->id) }}" target="_blank" class="btn btn-sm btn-outline-info">
-                                        <i class="fas fa-file-pdf me-1"></i>
-                                        View
-                                    </a>
-                                    <a href="{{ route('spk.export-pdf', $result->id) }}" class="btn btn-sm btn-outline-success">
-                                        <i class="fas fa-download me-1"></i>
-                                        Download
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary" data-detail-btn 
+                                            data-result-id="{{ $result->id }}" 
+                                            data-total-score="{{ $result->total_score }}" 
+                                            data-category="{{ $result->category }}" 
+                                            data-created="{{ $result->created_at->format('d F Y, H:i:s') }}"
+                                            title="Lihat Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="{{ route('spk.view-pdf', $result->id) }}" target="_blank" class="btn btn-sm btn-outline-info" title="Preview PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        <a href="{{ route('spk.export-pdf', $result->id) }}" class="btn btn-sm btn-outline-success" title="Download PDF">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -225,28 +255,28 @@
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
-                                <div class="col-md-3">
+                                <div class="col-md-6 col-sm-6">
                                     <div>
                                         <small class="text-muted d-block mb-2">Minat</small>
-                                        <span class="badge bg-danger fs-6" id="modalInputMinat">-</span>
+                                        <span class="badge bg-danger text-wrap" style="font-size: 0.85rem; max-width: 100%;" id="modalInputMinat">-</span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 col-sm-6">
                                     <div>
                                         <small class="text-muted d-block mb-2">Bakat</small>
-                                        <span class="badge bg-warning text-dark fs-6" id="modalInputBakat">-</span>
+                                        <span class="badge bg-warning text-dark text-wrap" style="font-size: 0.85rem; max-width: 100%;" id="modalInputBakat">-</span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 col-sm-6">
                                     <div>
                                         <small class="text-muted d-block mb-2">Prospek Karir</small>
-                                        <span class="badge bg-success fs-6" id="modalInputKarir">-</span>
+                                        <span class="badge bg-success text-wrap" style="font-size: 0.85rem; max-width: 100%;" id="modalInputKarir">-</span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6 col-sm-6">
                                     <div>
                                         <small class="text-muted d-block mb-2">Nilai Rata-rata</small>
-                                        <span class="badge bg-info fs-6" id="modalInputNilai">-</span>
+                                        <span class="badge bg-info" style="font-size: 0.85rem;" id="modalInputNilai">-</span>
                                     </div>
                                 </div>
                             </div>
