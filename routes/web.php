@@ -21,6 +21,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/jalankan-seed', function () {
     Artisan::call('db:seed', ['--force' => true]);
     return 'Seeding Database Berhasil!';
+});
 
 // Google OAuth Routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('google.login');
